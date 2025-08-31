@@ -1,21 +1,24 @@
-/* Variables de colores - Tema elegante tipo PedidosYa */
+/* Variables de colores - Tema moderno y elegante */
 :root {
-    --primary: #FF8000;          /* Naranja principal */
-    --primary-dark: #E67200;     /* Naranja oscuro */
-    --primary-light: #FFA34D;    /* Naranja claro */
-    --secondary: #00B2A9;        /* Verde azulado */
-    --accent: #FF3D57;           /* Rojo coral para énfasis */
-    --background: #F8F9FA;       /* Fondo gris claro */
-    --card-bg: #FFFFFF;          /* Fondo de tarjetas */
-    --text: #2D2D2D;             /* Texto principal */
-    --text-light: #666666;       /* Texto secundario */
-    --text-lighter: #999999;     /* Texto terciario */
-    --border: #E0E0E0;           /* Bordes */
-    --success: #4CAF50;          /* Éxito */
-    --warning: #FF9800;          /* Advertencia */
-    --error: #F44336;            /* Error */
-    --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+    --primary: #2D5BFF;           /* Azul moderno principal */
+    --primary-dark: #1A46E0;      /* Azul oscuro */
+    --primary-light: #5A7AFF;     /* Azul claro */
+    --secondary: #00C2A9;         /* Verde azulado sofisticado */
+    --accent: #FF4B8B;            /* Rosa coral para énfasis */
+    --neutral-dark: #1A1A2E;      /* Azul muy oscuro casi negro */
+    --neutral: #2D2D4D;           /* Azul oscuro para texto */
+    --neutral-medium: #4A4A6D;    /* Azul medio para texto secundario */
+    --neutral-light: #F0F2F8;     /* Fondo gris azulado claro */
+    --card-bg: #FFFFFF;           /* Fondo de tarjetas */
+    --border: #E2E8F0;           /* Bordes */
+    --success: #10B981;          /* Verde éxito */
+    --warning: #F59E0B;          /* Ámbar advertencia */
+    --error: #EF4444;            /* Rojo error */
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --gradient-primary: linear-gradient(135deg, #2D5BFF 0%, #5A7AFF 100%);
+    --gradient-secondary: linear-gradient(135deg, #00C2A9 0%, #00E0C2 100%);
+    --gradient-accent: linear-gradient(135deg, #FF4B8B 0%, #FF80AB 100%);
 }
 
 /* Estilos generales */
@@ -23,13 +26,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background: linear-gradient(135deg, #F8F9FA 0%, #E8ECEF 100%);
-    color: var(--text);
+    background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+    color: var(--neutral);
     overflow-x: hidden;
     height: 100vh;
     display: flex;
@@ -40,7 +43,7 @@ body {
     line-height: 1.6;
 }
 
-/* Simulador de móvil - Más elegante */
+/* Simulador de móvil - Diseño premium */
 .phone-mockup {
     width: 360px;
     height: 700px;
@@ -48,21 +51,22 @@ body {
     border-radius: 24px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 
-                0 0 0 4px #f0f0f0, 
-                0 0 0 7px white;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 0 0 4px #f8fafc,
+                0 0 0 6px white;
     display: flex;
     flex-direction: column;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Notch más moderno */
+/* Notch minimalista */
 .notch {
-    width: 40%;
-    height: 24px;
-    background: black;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+    width: 35%;
+    height: 22px;
+    background: var(--neutral-dark);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     position: absolute;
     top: 0;
     left: 50%;
@@ -75,9 +79,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 20px;
-    height: 36px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 10px 22px;
+    height: 38px;
+    background: var(--neutral-dark);
     font-size: 12px;
     font-weight: 600;
     z-index: 999;
@@ -96,60 +100,61 @@ body {
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Header rediseñado */
+/* Header sofisticado */
 header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: var(--neutral-dark);
     color: white;
-    padding: 18px 24px;
+    padding: 20px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: 24px;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     letter-spacing: 0.5px;
 }
 
 .logo i {
-    font-size: 28px;
+    font-size: 26px;
+    color: var(--primary-light);
 }
 
 .header-icons {
     display: flex;
-    gap: 18px;
+    gap: 16px;
 }
 
 .icon-btn {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
     border: none;
     color: white;
     font-size: 20px;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     backdrop-filter: blur(10px);
 }
 
 .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
 }
 
-/* Barra de búsqueda elegante */
+/* Barra de búsqueda moderna */
 .search-bar {
-    padding: 20px;
+    padding: 22px;
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border);
 }
@@ -162,12 +167,12 @@ header {
 
 .search-input {
     width: 100%;
-    padding: 16px 20px 16px 50px;
-    border-radius: 25px;
-    border: 2px solid var(--border);
+    padding: 16px 20px 16px 52px;
+    border-radius: 16px;
+    border: 1.5px solid var(--border);
     font-size: 16px;
     background: var(--card-bg);
-    color: var(--text);
+    color: var(--neutral);
     font-weight: 500;
     transition: all 0.3s ease;
     box-shadow: var(--shadow);
@@ -176,25 +181,25 @@ header {
 .search-input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.1);
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 3px rgba(45, 91, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .search-input::placeholder {
-    color: var(--text-lighter);
+    color: var(--neutral-medium);
     font-weight: 400;
 }
 
 .search-icon {
     position: absolute;
-    left: 20px;
+    left: 22px;
     color: var(--primary);
     font-size: 18px;
 }
 
-/* Categorías rediseñadas */
+/* Categorías con diseño moderno */
 .categories {
-    padding: 20px;
+    padding: 22px;
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: none;
@@ -211,24 +216,24 @@ header {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    margin-right: 24px;
+    margin-right: 26px;
     text-decoration: none;
-    transition: transform 0.2s ease;
+    transition: transform 0.3s ease;
 }
 
 .category:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .category-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    background: var(--gradient-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 26px;
     margin-bottom: 12px;
     color: white;
     box-shadow: var(--shadow);
@@ -236,29 +241,29 @@ header {
 }
 
 .category:hover .category-icon {
-    transform: scale(1.05);
+    transform: scale(1.08);
     box-shadow: var(--shadow-hover);
 }
 
 .category:nth-child(2n) .category-icon {
-    background: linear-gradient(135deg, var(--secondary) 0%, #00C9BF 100%);
+    background: var(--gradient-secondary);
 }
 
 .category:nth-child(3n) .category-icon {
-    background: linear-gradient(135deg, var(--accent) 0%, #FF6B7D 100%);
+    background: var(--gradient-accent);
 }
 
 .category:nth-child(4n) .category-icon {
-    background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
+    background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
 }
 
 .category:nth-child(5n) .category-icon {
-    background: linear-gradient(135deg, #2196F3 0%, #64B5F6 100%);
+    background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
 }
 
 .category-name {
-    font-size: 14px;
-    color: var(--text);
+    font-size: 13px;
+    color: var(--neutral);
     font-weight: 600;
     text-align: center;
     max-width: 80px;
@@ -269,19 +274,19 @@ header {
     flex: 1;
     overflow-y: auto;
     padding-bottom: 80px;
-    background: var(--background);
+    background: var(--neutral-light);
 }
 
 /* Títulos de sección */
 .section-title {
-    padding: 20px 24px 10px;
+    padding: 22px 24px 12px;
     font-size: 20px;
     font-weight: 700;
-    color: var(--text);
+    color: var(--neutral-dark);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--background);
+    background: var(--neutral-light);
 }
 
 .view-all {
@@ -295,23 +300,23 @@ header {
 }
 
 .view-all:hover {
-    background: rgba(255, 128, 0, 0.1);
+    background: rgba(45, 91, 255, 0.1);
 }
 
-/* Restaurantes - Tarjetas elegantes */
+/* Restaurantes - Tarjetas modernas */
 .restaurants {
-    padding: 0 20px 20px;
+    padding: 0 22px 22px;
 }
 
 .restaurant-card {
     background-color: var(--card-bg);
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
     margin-bottom: 20px;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 .restaurant-card:hover {
@@ -326,7 +331,7 @@ header {
 .restaurant-image {
     width: 100%;
     height: 180px;
-    background: linear-gradient(135deg, #FF8000 0%, #FFA34D 100%);
+    background: linear-gradient(135deg, #2D5BFF 0%, #5A7AFF 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -343,7 +348,7 @@ header {
     left: 0;
     width: 100%;
     height: 40%;
-    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+    background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
 }
 
 .restaurant-info {
@@ -354,11 +359,11 @@ header {
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: var(--text);
+    color: var(--neutral-dark);
 }
 
 .restaurant-category {
-    color: var(--text-light);
+    color: var(--neutral-medium);
     font-size: 14px;
     margin-bottom: 12px;
     font-weight: 500;
@@ -368,7 +373,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--text-light);
+    color: var(--neutral-medium);
     font-size: 14px;
 }
 
@@ -384,7 +389,7 @@ header {
     font-size: 14px;
 }
 
-/* Navegación inferior elegante */
+/* Navegación inferior moderna */
 .bottom-nav {
     position: absolute;
     bottom: 0;
@@ -393,15 +398,15 @@ header {
     justify-content: space-around;
     background-color: var(--card-bg);
     padding: 16px 0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
     border-top: 1px solid var(--border);
     z-index: 1000;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
 }
 
 .nav-item {
     text-align: center;
-    color: var(--text-light);
+    color: var(--neutral-medium);
     font-size: 12px;
     flex: 1;
     cursor: pointer;
@@ -413,7 +418,7 @@ header {
 
 .nav-item:hover {
     color: var(--primary);
-    background: rgba(255, 128, 0, 0.05);
+    background: rgba(45, 91, 255, 0.05);
 }
 
 .nav-item.active {
@@ -424,6 +429,7 @@ header {
 
 .nav-item.active .nav-icon {
     transform: scale(1.1);
+    color: var(--primary);
 }
 
 .nav-icon {
@@ -437,7 +443,7 @@ header {
     position: absolute;
     top: -2px;
     right: 20px;
-    background: linear-gradient(135deg, var(--accent) 0%, #FF6B7D 100%);
+    background: var(--gradient-accent);
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -448,27 +454,28 @@ header {
     justify-content: center;
     font-weight: 700;
     border: 2px solid var(--card-bg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Botones elegantes */
+/* Botones modernos */
 .add-to-cart, .checkout-btn, .back-to-home {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: var(--gradient-primary);
     color: white;
     border: none;
-    border-radius: 25px;
-    padding: 12px 24px;
+    border-radius: 14px;
+    padding: 14px 26px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: var(--shadow);
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 15px;
+    letter-spacing: 0.3px;
 }
 
 .add-to-cart {
-    padding: 10px 20px;
-    font-size: 13px;
+    padding: 12px 22px;
+    font-size: 14px;
+    border-radius: 12px;
 }
 
 .add-to-cart:hover, .checkout-btn:hover, .back-to-home:hover {
@@ -517,7 +524,7 @@ header {
     }
     
     .categories {
-        padding: 15px;
+        padding: 18px;
     }
     
     .category-icon {
@@ -541,14 +548,33 @@ header {
     }
 }
 
-/* Modo oscuro opcional (puedes implementarlo después) */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #1A1A1A;
-        --card-bg: #2D2D2D;
-        --text: #FFFFFF;
-        --text-light: #CCCCCC;
-        --text-lighter: #999999;
-        --border: #404040;
-    }
+/* Ajustes para el resto de vistas (productos, carrito, etc.) */
+.product-card, .cart-item, .order-card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.product-card:hover, .cart-item:hover, .order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.confirmation-icon {
+    color: var(--secondary);
+}
+
+/* Ajustes para vistas específicas */
+#products-view header, #cart-view header, #search-view header, #orders-view header, #profile-view header {
+    background: var(--neutral-dark);
+}
+
+/* Mejora para el texto en vistas de confirmación */
+.confirmation-title {
+    color: var(--neutral-dark);
+}
+
+.confirmation-text {
+    color: var(--neutral-medium);
 }
