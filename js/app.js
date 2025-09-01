@@ -338,17 +338,112 @@ function handleCheckout() {
 // Manejar búsqueda
 function handleSearch(e) {
     const query = e.target.value.trim();
-    if (query.length < 2) return;
+    
+    if (query.length < 2) {
+        // Mostrar restaurantes populares si la búsqueda es muy corta
+        loadRestaurants();
+        return;
+    }
     
     console.log('Buscando:', query);
-    // Aquí iría la lógica de búsqueda real
+    
+    // Buscar restaurantes
+    const results = SampleData.searchRestaurants(query);
+    
+    // Mostrar resultados en la vista de búsqueda
+    showView('search-view');
+    displaySearchResults(results);
 }
 
 // Manejar click en categoría
 function handleCategoryClick(category) {
     console.log('Categoría seleccionada:', category);
-    // Aquí iría la lógica para filtrar por categoría
-    showNotification(`Mostrando ${category}`, 'info');
+    
+    // Obtener restaurantes de la categoría
+    const restaurants = SampleData.getRestaurantsByCategory(category);
+    
+    // Mostrar en la vista de búsqueda
+    showView('search-view');
+    displaySearchResults(restaurants, category);
+}
+
+// Mostrar resultados de búsqueda
+function displaySearchResults(results, category = null) {
+    const searchResultsContainer = document.getElementById('search-results');
+    
+    if (!searchResultsContainer) return;
+    
+    if (results.length === 0) {
+        searchResultsContainer.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <p>No se encontraron restaurantes</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const resultsHTML = results.map(restaurant => `
+        <div class="restaurant-card" onclick="openRestaurant('${restaurant.id}')">
+            <div class="restaurant-image" style="background-image: url('${restaurant.image_url}')">
+                <div class="restaurant-overlay">
+                    <span class="restaurant-category">${restaurant.category}</span>
+                </div>
+            </div>
+            <div class="restaurant-info">
+                <div class="restaurant-name">${restaurant.name}</div>
+                <div class="restaurant-category">${restaurant.description}</div>
+                <div class="restaurant-meta">
+                    <span class="rating">⭐ ${restaurant.rating}</span>
+                    <span>${restaurant.delivery_time} min</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    searchResultsContainer.innerHTML = resultsHTML;
+}
+
+// Abrir restaurante
+function openRestaurant(restaurantId) {
+    const restaurant = SampleData.restaurants.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+    
+    // Actualizar nombre del restaurante
+    const restaurantNameElement = document.getElementById('restaurant-name');
+    if (restaurantNameElement) {
+        restaurantNameElement.textContent = restaurant.name;
+    }
+    
+    // Cargar productos
+    loadProducts(restaurantId);
+    
+    // Cambiar a vista de productos
+    showView('products-view');
+}
+
+// Cargar productos de un restaurante
+function loadProducts(restaurantId) {
+    const products = SampleData.getProductsByRestaurant(restaurantId);
+    const productListContainer = document.getElementById('product-list');
+    
+    if (!productListContainer) return;
+    
+    const productsHTML = products.map(product => `
+        <div class="product-card" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+            <div class="product-image" style="background-image: url('${product.image_url}')"></div>
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-desc">${product.description}</div>
+                <div class="product-meta">
+                    <span class="product-price">$${product.price.toFixed(2)}</span>
+                    <button class="btn btn-sm">Agregar</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    productListContainer.innerHTML = productsHTML;
 }
 
 // Mostrar vista
@@ -381,6 +476,11 @@ function showView(viewName) {
                 updateActiveNavItem(viewName);
             }
         }
+    }
+    
+    // Cargar datos específicos de la vista
+    if (viewName === 'home-view' && AppState.isAuthenticated) {
+        loadRestaurants();
     }
     
     console.log('✅ Vista activa:', viewName);
@@ -469,13 +569,77 @@ function addToCart(product) {
     }
     
     updateCartCount();
+    updateCartDisplay();
     showNotification('Producto agregado al carrito', 'success');
+}
+
+// Actualizar visualización del carrito
+function updateCartDisplay() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    const subtotalElement = document.getElementById('subtotal');
+    const taxElement = document.getElementById('tax');
+    const totalElement = document.getElementById('total');
+    
+    if (!cartItemsContainer) return;
+    
+    if (AppState.cart.length === 0) {
+        cartItemsContainer.innerHTML = `
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Tu carrito está vacío</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const cartItemsHTML = AppState.cart.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-image" style="background-image: url('${item.image_url}')"></div>
+            <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+            <div class="cart-item-controls">
+                <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                <span>${item.quantity}</span>
+                <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+            </div>
+        </div>
+    `).join('');
+    
+    cartItemsContainer.innerHTML = cartItemsHTML;
+    
+    // Actualizar totales
+    const subtotal = calculateCartTotal();
+    const tax = subtotal * CONFIG.TAX_RATE;
+    const total = subtotal + tax + CONFIG.SHIPPING_COST;
+    
+    if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+    if (taxElement) taxElement.textContent = `$${tax.toFixed(2)}`;
+    if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
+}
+
+// Actualizar cantidad de un producto
+function updateQuantity(productId, change) {
+    const item = AppState.cart.find(item => item.id === productId);
+    
+    if (!item) return;
+    
+    item.quantity += change;
+    
+    if (item.quantity <= 0) {
+        removeFromCart(productId);
+    } else {
+        updateCartCount();
+        updateCartDisplay();
+    }
 }
 
 // Remover del carrito
 function removeFromCart(productId) {
     AppState.cart = AppState.cart.filter(item => item.id !== productId);
     updateCartCount();
+    updateCartDisplay();
     showNotification('Producto removido del carrito', 'info');
 }
 
@@ -484,6 +648,35 @@ function calculateCartTotal() {
     return AppState.cart.reduce((total, item) => {
         return total + (item.price * item.quantity);
     }, 0);
+}
+
+// Cargar restaurantes en la vista principal
+function loadRestaurants() {
+    const restaurantsContainer = document.getElementById('restaurants-list');
+    
+    if (!restaurantsContainer) return;
+    
+    const restaurants = SampleData.restaurants.slice(0, 4); // Mostrar solo 4 restaurantes
+    
+    const restaurantsHTML = restaurants.map(restaurant => `
+        <div class="restaurant-card" onclick="openRestaurant('${restaurant.id}')">
+            <div class="restaurant-image" style="background-image: url('${restaurant.image_url}')">
+                <div class="restaurant-overlay">
+                    <span class="restaurant-category">${restaurant.category}</span>
+                </div>
+            </div>
+            <div class="restaurant-info">
+                <div class="restaurant-name">${restaurant.name}</div>
+                <div class="restaurant-category">${restaurant.description}</div>
+                <div class="restaurant-meta">
+                    <span class="rating">⭐ ${restaurant.rating}</span>
+                    <span>${restaurant.delivery_time} min</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    restaurantsContainer.innerHTML = restaurantsHTML;
 }
 
 // Inicializar cuando el DOM esté listo
