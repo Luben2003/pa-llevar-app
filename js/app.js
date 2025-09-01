@@ -1,11 +1,14 @@
-// Datos de ejemplo para la aplicación
+// ===== DATOS DE EJEMPLO =====
 const restaurants = [
     {
         id: 1,
         name: "La Pizza Nostra",
         category: "Italiana • Pizza • Pasta",
         rating: 4.8,
+        reviews: 500,
         deliveryTime: "25-35 min",
+        image: "pizza",
+        tags: ["pizza", "pasta", "italiana"],
         products: [
             { id: 101, name: "Pizza Margherita", description: "Salsa de tomate, mozzarella y albahaca", price: 9.99, icon: "fas fa-pizza-slice" },
             { id: 102, name: "Pizza Pepperoni", description: "Salsa de tomate, mozzarella y pepperoni", price: 11.99, icon: "fas fa-pizza-slice" },
@@ -18,7 +21,10 @@ const restaurants = [
         name: "Burger Paradise",
         category: "Americana • Hamburguesas",
         rating: 4.5,
+        reviews: 350,
         deliveryTime: "20-30 min",
+        image: "hamburguesa",
+        tags: ["hamburguesa", "americana", "comida rápida"],
         products: [
             { id: 201, name: "Burger Clásica", description: "Carne, lechuga, tomate y queso", price: 8.99, icon: "fas fa-hamburger" },
             { id: 202, name: "Burger BBQ", description: "Carne, bacon, cebolla crispy y salsa BBQ", price: 10.99, icon: "fas fa-hamburger" },
@@ -31,27 +37,69 @@ const restaurants = [
         name: "Sushi Express",
         category: "Japonesa • Sushi • Poke",
         rating: 4.6,
+        reviews: 420,
         deliveryTime: "30-40 min",
+        image: "sushi",
+        tags: ["sushi", "japonesa", "poke", "asia"],
         products: [
             { id: 301, name: "Roll California", description: "Cangrejo, aguacate y pepino", price: 12.99, icon: "fas fa-fish" },
             { id: 302, name: "Roll Philadelphia", description: "Salmón, queso crema y aguacate", price: 13.99, icon: "fas fa-fish" },
             { id: 303, name: "Sashimi Mixto", description: "Variedad de pescado crudo", price: 15.99, icon: "fas fa-fish" },
             { id: 304, name: "Bowl Poke", description: "Arroz, salmón, aguacate y vegetales", price: 11.99, icon: "fas fa-bowl-food" }
         ]
+    },
+    {
+        id: 4,
+        name: "Café Central",
+        category: "Café • Postres • Breakfast",
+        rating: 4.7,
+        reviews: 280,
+        deliveryTime: "15-25 min",
+        image: "cafe",
+        tags: ["café", "postres", "desayuno", "té"],
+        products: [
+            { id: 401, name: "Cappuccino", description: "Café espresso con leche vaporizada", price: 3.99, icon: "fas fa-coffee" },
+            { id: 402, name: "Croissant", description: "Crujiente croissant de mantequilla", price: 2.99, icon: "fas fa-bread-slice" },
+            { id: 403, name: "Tarta de Manzana", description: "Tarta dulce con manzanas caramelizadas", price: 4.99, icon: "fas fa-pie" },
+            { id: 404, name: "Té Chai", description: "Té especiado con leche", price: 3.49, icon: "fas fa-mug-hot" }
+        ]
+    },
+    {
+        id: 5,
+        name: "Dulce Tentación",
+        category: "Postres • Helados • Repostería",
+        rating: 4.9,
+        reviews: 190,
+        deliveryTime: "20-30 min",
+        image: "postres",
+        tags: ["postres", "helados", "repostería", "dulce"],
+        products: [
+            { id: 501, name: "Helado de Vainilla", description: "Helado cremoso de vainilla", price: 4.99, icon: "fas fa-ice-cream" },
+            { id: 502, name: "Brownie de Chocolate", description: "Brownie esponjoso con nueces", price: 5.99, icon: "fas fa-cookie" },
+            { id: 503, name: "Cheesecake", description: "Tarta de queso con base de galleta", price: 6.99, icon: "fas fa-cheese" },
+            { id: 504, name: "Cupcakes", description: "Deliciosos cupcakes decorados", price: 3.99, icon: "fas fa-birthday-cake" }
+        ]
     }
 ];
 
-// Estado de la aplicación
-let cart = [];
+// ===== ESTADO DE LA APLICACIÓN =====
+let cart = JSON.parse(localStorage.getItem('paLlevarCart')) || [];
+let orders = JSON.parse(localStorage.getItem('paLlevarOrders')) || [];
 let currentRestaurant = null;
+let currentUser = JSON.parse(localStorage.getItem('paLlevarCurrentUser')) || {
+    name: "Usuario Ejemplo",
+    email: "usuario@ejemplo.com"
+};
+let isOnline = navigator.onLine;
 
-// Elementos DOM
+// ===== ELEMENTOS DOM =====
 const views = document.querySelectorAll('.view');
 const navItems = document.querySelectorAll('.nav-item');
 const cartCount = document.getElementById('cart-count');
 const cartItems = document.getElementById('cart-items');
 const productList = document.getElementById('product-list');
 const restaurantName = document.getElementById('restaurant-name');
+const restaurantsList = document.getElementById('restaurants-list');
 const subtotalEl = document.getElementById('subtotal');
 const shippingEl = document.getElementById('shipping');
 const taxEl = document.getElementById('tax');
@@ -60,10 +108,21 @@ const checkoutBtn = document.getElementById('checkout-btn');
 const backButton = document.getElementById('back-button');
 const backFromCart = document.getElementById('back-from-cart');
 const backToHome = document.getElementById('back-to-home');
+const backFromSearch = document.getElementById('back-from-search');
+const backFromOrders = document.getElementById('back-from-orders');
+const backFromProfile = document.getElementById('back-from-profile');
 const orderNumber = document.getElementById('order-number');
-const currentTime = document.getElementById('current-time');
+const homeSearch = document.getElementById('home-search');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+const ordersList = document.getElementById('orders-list');
+const viewAllRestaurants = document.getElementById('view-all-restaurants');
+const userName = document.getElementById('user-name');
+const userEmail = document.getElementById('user-email');
+const logoutBtn = document.getElementById('logout-btn');
+const categories = document.querySelectorAll('.category');
 
-// Funciones de navegación
+// ===== FUNCIONES DE NAVEGACIÓN =====
 function showView(viewId) {
     views.forEach(view => view.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
@@ -76,20 +135,24 @@ function showView(viewId) {
         }
     });
     
+    // Acciones específicas para cada vista
     if (viewId === 'cart-view') {
         updateCartView();
+    } else if (viewId === 'orders-view') {
+        loadOrders();
+    } else if (viewId === 'profile-view') {
+        loadProfile();
+    } else if (viewId === 'home-view') {
+        renderRestaurants(restaurants);
     }
 }
 
-// Inicializar la aplicación
+// ===== INICIALIZACIÓN =====
 function initApp() {
     // Navegación inferior
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const viewId = item.getAttribute('data-view');
-            if (viewId === 'cart-view') {
-                updateCartView();
-            }
             showView(viewId);
         });
     });
@@ -103,42 +166,103 @@ function initApp() {
             showView('home-view');
         }
     });
+    backFromSearch.addEventListener('click', () => showView('home-view'));
+    backFromOrders.addEventListener('click', () => showView('home-view'));
+    backFromProfile.addEventListener('click', () => showView('home-view'));
     
     // Botón de volver al inicio
     backToHome.addEventListener('click', () => {
-        cart = [];
-        updateCartCount();
         showView('home-view');
     });
     
     // Botón de checkout
-    checkoutBtn.addEventListener('click', () => {
-        // Generar número de pedido aleatorio
-        orderNumber.textContent = Math.floor(10000 + Math.random() * 90000);
-        showView('confirmation-view');
-        
-        // Limpiar carrito después de realizar pedido
-        cart = [];
-        updateCartCount();
+    checkoutBtn.addEventListener('click', checkout);
+    
+    // Búsqueda
+    homeSearch.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query.length > 2) {
+            showView('search-view');
+            searchInput.value = query;
+            performSearch(query);
+        }
     });
     
-    // Restaurantes clickeables
-    document.querySelectorAll('.restaurant-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const restaurantId = parseInt(card.getAttribute('data-id'));
-            openRestaurant(restaurantId);
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        performSearch(query);
+    });
+    
+    // Ver todos los restaurantes
+    viewAllRestaurants.addEventListener('click', () => {
+        showView('search-view');
+        searchInput.value = '';
+        performSearch('');
+    });
+    
+    // Categorías
+    categories.forEach(category => {
+        category.addEventListener('click', () => {
+            const categoryName = category.getAttribute('data-category');
+            showView('search-view');
+            searchInput.value = categoryName;
+            performSearch(categoryName);
         });
     });
     
-    // Actualizar la hora
-    updateTime();
-    setInterval(updateTime, 60000);
+    // Cerrar sesión
+    logoutBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            localStorage.removeItem('paLlevarCart');
+            localStorage.removeItem('paLlevarOrders');
+            localStorage.removeItem('paLlevarCurrentUser');
+            cart = [];
+            orders = [];
+            currentUser = null;
+            updateCartCount();
+            showView('home-view');
+            alert('Sesión cerrada correctamente');
+        }
+    });
     
-    // Inicializar el carrito
+    // Inicializar vistas
+    renderRestaurants(restaurants);
     updateCartCount();
+    loadProfile();
+    updateOnlineStatus();
 }
 
-// Abrir un restaurante y mostrar sus productos
+// ===== RENDERIZADO DE RESTAURANTES =====
+function renderRestaurants(restaurantsToRender) {
+    restaurantsList.innerHTML = '';
+    
+    restaurantsToRender.forEach(restaurant => {
+        const restaurantElement = document.createElement('div');
+        restaurantElement.className = 'restaurant-card';
+        restaurantElement.setAttribute('data-id', restaurant.id);
+        restaurantElement.innerHTML = `
+            <div class="restaurant-image">
+                <i class="fas fa-${restaurant.image}"></i>
+            </div>
+            <div class="restaurant-info">
+                <div class="restaurant-name">${restaurant.name}</div>
+                <div class="restaurant-category">${restaurant.category}</div>
+                <div class="restaurant-meta">
+                    <span class="rating"><i class="fas fa-star"></i> ${restaurant.rating} (${restaurant.reviews}+)</span>
+                    <span>${restaurant.deliveryTime}</span>
+                </div>
+            </div>
+        `;
+        
+        restaurantElement.addEventListener('click', () => {
+            openRestaurant(restaurant.id);
+        });
+        
+        restaurantsList.appendChild(restaurantElement);
+    });
+}
+
+// ===== ABRIR RESTAURANTE =====
 function openRestaurant(restaurantId) {
     const restaurant = restaurants.find(r => r.id === restaurantId);
     if (restaurant) {
@@ -149,7 +273,7 @@ function openRestaurant(restaurantId) {
     }
 }
 
-// Renderizar productos
+// ===== RENDERIZADO DE PRODUCTOS =====
 function renderProducts(products) {
     productList.innerHTML = '';
     
@@ -165,27 +289,23 @@ function renderProducts(products) {
                 <div class="product-desc">${product.description}</div>
                 <div class="product-meta">
                     <div class="product-price">$${product.price.toFixed(2)}</div>
-                    <button class="add-to-cart" data-id="${product.id}">Añadir</button>
+                    <button class="btn btn-sm add-to-cart" data-id="${product.id}">Añadir</button>
                 </div>
             </div>
         `;
         
-        productList.appendChild(productElement);
-    });
-    
-    // Añadir event listeners a los botones
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        productElement.querySelector('.add-to-cart').addEventListener('click', (e) => {
             const productId = parseInt(e.target.getAttribute('data-id'));
             addToCart(productId);
             e.stopPropagation();
         });
+        
+        productList.appendChild(productElement);
     });
 }
 
-// Añadir producto al carrito
+// ===== FUNCIONES DEL CARRITO =====
 function addToCart(productId) {
-    // Buscar el producto en todos los restaurantes
     let product = null;
     for (const restaurant of restaurants) {
         product = restaurant.products.find(p => p.id === productId);
@@ -193,7 +313,6 @@ function addToCart(productId) {
     }
     
     if (product) {
-        // Verificar si el producto ya está en el carrito
         const existingItem = cart.find(item => item.id === productId);
         
         if (existingItem) {
@@ -204,13 +323,15 @@ function addToCart(productId) {
                 name: product.name,
                 price: product.price,
                 quantity: 1,
-                icon: product.icon
+                icon: product.icon,
+                restaurant: currentRestaurant.name
             });
         }
         
         updateCartCount();
+        saveCart();
         
-        // Mostrar feedback visual
+        // Feedback visual
         const button = document.querySelector(`.add-to-cart[data-id="${productId}"]`);
         const originalText = button.textContent;
         button.textContent = "✓ Añadido";
@@ -223,18 +344,20 @@ function addToCart(productId) {
     }
 }
 
-// Actualizar contador del carrito
 function updateCartCount() {
     const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
     cartCount.textContent = totalItems;
 }
 
-// Actualizar vista del carrito
+function saveCart() {
+    localStorage.setItem('paLlevarCart', JSON.stringify(cart));
+}
+
 function updateCartView() {
     cartItems.innerHTML = '';
     
     if (cart.length === 0) {
-        cartItems.innerHTML = '<p style="text-align: center; padding: 20px; color: #777;">Tu carrito está vacío</p>';
+        cartItems.innerHTML = '<p class="no-results"><i class="fas fa-shopping-cart"></i>Tu carrito está vacío</p>';
         checkoutBtn.disabled = true;
         checkoutBtn.style.opacity = '0.5';
     } else {
@@ -251,6 +374,7 @@ function updateCartView() {
                 <div class="cart-item-info">
                     <div class="cart-item-name">${item.name}</div>
                     <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                    <div style="font-size: 12px; color: #777;">${item.restaurant}</div>
                 </div>
                 <div class="cart-item-controls">
                     <button class="quantity-btn minus" data-id="${item.id}">-</button>
@@ -259,41 +383,36 @@ function updateCartView() {
                 </div>
             `;
             
-            cartItems.appendChild(cartItemElement);
-        });
-        
-        // Añadir event listeners a los botones de cantidad
-        document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productId = parseInt(btn.getAttribute('data-id'));
-                const item = cart.find(item => item.id === productId);
-                if (item) {
-                    item.quantity += 1;
+            cartItemElement.querySelector('.plus').addEventListener('click', () => {
+                const itemIndex = cart.findIndex(i => i.id === item.id);
+                if (itemIndex !== -1) {
+                    cart[itemIndex].quantity += 1;
                     updateCartView();
                     updateCartCount();
+                    saveCart();
                 }
             });
-        });
-        
-        document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productId = parseInt(btn.getAttribute('data-id'));
-                const item = cart.find(item => item.id === productId);
-                if (item) {
-                    item.quantity -= 1;
-                    if (item.quantity <= 0) {
-                        cart = cart.filter(i => i.id !== productId);
+            
+            cartItemElement.querySelector('.minus').addEventListener('click', () => {
+                const itemIndex = cart.findIndex(i => i.id === item.id);
+                if (itemIndex !== -1) {
+                    cart[itemIndex].quantity -= 1;
+                    if (cart[itemIndex].quantity <= 0) {
+                        cart.splice(itemIndex, 1);
                     }
                     updateCartView();
                     updateCartCount();
+                    saveCart();
                 }
             });
+            
+            cartItems.appendChild(cartItemElement);
         });
     }
     
     // Actualizar totales
     const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    const tax = subtotal * 0.1; // 10% de impuestos
+    const tax = subtotal * 0.1;
     const shipping = subtotal > 0 ? 2.5 : 0;
     const total = subtotal + tax + shipping;
     
@@ -303,13 +422,356 @@ function updateCartView() {
     totalEl.textContent = `$${total.toFixed(2)}`;
 }
 
-// Actualizar la hora
-function updateTime() {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    currentTime.textContent = `${hours}:${minutes}`;
+function checkout() {
+    if (cart.length === 0) {
+        showNotification('Carrito vacío', 'Agrega productos antes de continuar');
+        return;
+    }
+    
+    const order = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(),
+        items: [...cart],
+        subtotal: cart.reduce((total, item) => total + (item.price * item.quantity), 0),
+        tax: cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 0.1,
+        shipping: 2.5,
+        total: cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 1.1 + 2.5,
+        status: 'Preparando'
+    };
+    
+    if (isOnline) {
+        // Enviar al servidor
+        sendOrderToServer(order)
+            .then(() => {
+                orders.unshift(order);
+                saveOrders();
+                completeCheckout(order);
+            })
+            .catch(() => {
+                // Fallback offline
+                offlineManager.addPendingOrder(order);
+                completeCheckout(order);
+            });
+    } else {
+        // Modo offline
+        offlineManager.addPendingOrder(order);
+        completeCheckout(order);
+        showNotification('Pedido en modo offline', 'Se enviará cuando tengas conexión');
+    }
 }
 
-// Inicializar la aplicación cuando el DOM esté listo
+function completeCheckout(order) {
+    cart = [];
+    saveCart();
+    updateCartCount();
+    orderNumber.textContent = order.id;
+    showView('confirmation-view');
+    
+    // Mostrar notificación
+    showNotification('¡Pedido Confirmado!', {
+        body: `Tu pedido #${order.id} está siendo preparado`,
+        icon: '/assets/icon-192.png'
+    });
+}
+
+async function sendOrderToServer(order) {
+    // Simulación de envío al servidor
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            // Simular fallo aleatorio (20% de probabilidad)
+            if (Math.random() < 0.8) {
+                resolve();
+            } else {
+                reject(new Error('Error de conexión'));
+            }
+        }, 1000);
+    });
+}
+
+// ===== BÚSQUEDA =====
+function performSearch(query) {
+    searchResults.innerHTML = '';
+    
+    if (query === '') {
+        // Mostrar todos los restaurantes si no hay query
+        restaurants.forEach(restaurant => {
+            const restaurantElement = document.createElement('div');
+            restaurantElement.className = 'restaurant-card';
+            restaurantElement.setAttribute('data-id', restaurant.id);
+            restaurantElement.innerHTML = `
+                <div class="restaurant-image">
+                    <i class="fas fa-${restaurant.image}"></i>
+                </div>
+                <div class="restaurant-info">
+                    <div class="restaurant-name">${restaurant.name}</div>
+                    <div class="restaurant-category">${restaurant.category}</div>
+                    <div class="restaurant-meta">
+                        <span class="rating"><i class="fas fa-star"></i> ${restaurant.rating} (${restaurant.reviews}+)</span>
+                        <span>${restaurant.deliveryTime}</span>
+                    </div>
+                </div>
+            `;
+            
+            restaurantElement.addEventListener('click', () => {
+                openRestaurant(restaurant.id);
+            });
+            
+            searchResults.appendChild(restaurantElement);
+        });
+        return;
+    }
+    
+    // Buscar restaurantes
+    const restaurantResults = restaurants.filter(restaurant => 
+        restaurant.name.toLowerCase().includes(query) || 
+        restaurant.category.toLowerCase().includes(query) ||
+        restaurant.tags.some(tag => tag.includes(query))
+    );
+    
+    // Buscar productos
+    const productResults = [];
+    restaurants.forEach(restaurant => {
+        restaurant.products.forEach(product => {
+            if (product.name.toLowerCase().includes(query) || 
+                product.description.toLowerCase().includes(query)) {
+                productResults.push({
+                    ...product,
+                    restaurant: restaurant.name,
+                    restaurantId: restaurant.id
+                });
+            }
+        });
+    });
+    
+    // Mostrar resultados
+    if (restaurantResults.length === 0 && productResults.length === 0) {
+        searchResults.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <p>No se encontraron resultados para "${query}"</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Mostrar restaurantes encontrados
+    if (restaurantResults.length > 0) {
+        const title = document.createElement('div');
+        title.className = 'section-title';
+        title.innerHTML = '<span>Restaurantes</span>';
+        searchResults.appendChild(title);
+        
+        restaurantResults.forEach(restaurant => {
+            const restaurantElement = document.createElement('div');
+            restaurantElement.className = 'restaurant-card';
+            restaurantElement.setAttribute('data-id', restaurant.id);
+            restaurantElement.innerHTML = `
+                <div class="restaurant-image">
+                    <i class="fas fa-${restaurant.image}"></i>
+                </div>
+                <div class="restaurant-info">
+                    <div class="restaurant-name">${restaurant.name}</div>
+                    <div class="restaurant-category">${restaurant.category}</div>
+                    <div class="restaurant-meta">
+                        <span class="rating"><i class="fas fa-star"></i> ${restaurant.rating} (${restaurant.reviews}+)</span>
+                        <span>${restaurant.deliveryTime}</span>
+                    </div>
+                </div>
+            `;
+            
+            restaurantElement.addEventListener('click', () => {
+                openRestaurant(restaurant.id);
+            });
+            
+            searchResults.appendChild(restaurantElement);
+        });
+    }
+    
+    // Mostrar productos encontrados
+    if (productResults.length > 0) {
+        const title = document.createElement('div');
+        title.className = 'section-title';
+        title.innerHTML = '<span>Productos</span>';
+        searchResults.appendChild(title);
+        
+        productResults.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'product-card';
+            productElement.innerHTML = `
+                <div class="product-image">
+                    <i class="${product.icon}"></i>
+                </div>
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-desc">${product.description}</div>
+                    <div style="font-size: 12px; color: #777;">${product.restaurant}</div>
+                    <div class="product-meta">
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <button class="btn btn-sm add-to-cart" data-id="${product.id}" data-restaurant="${product.restaurantId}">Añadir</button>
+                    </div>
+                </div>
+            `;
+            
+            productElement.querySelector('.add-to-cart').addEventListener('click', (e) => {
+                const productId = parseInt(e.target.getAttribute('data-id'));
+                const restaurantId = parseInt(e.target.getAttribute('data-restaurant'));
+                
+                // Abrir el restaurante primero
+                const restaurant = restaurants.find(r => r.id === restaurantId);
+                if (restaurant) {
+                    currentRestaurant = restaurant;
+                    addToCart(productId);
+                }
+                
+                e.stopPropagation();
+            });
+            
+            searchResults.appendChild(productElement);
+        });
+    }
+}
+
+// ===== PEDIDOS =====
+function loadOrders() {
+    ordersList.innerHTML = '';
+    
+    if (orders.length === 0) {
+        ordersList.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-shopping-bag"></i>
+                <p>No tienes pedidos realizados</p>
+            </div>
+        `;
+        return;
+    }
+    
+    orders.forEach(order => {
+        const orderElement = document.createElement('div');
+        orderElement.className = 'order-card';
+        orderElement.innerHTML = `
+            <div class="order-header">
+                <div class="order-number">Pedido #${order.id}</div>
+                <div class="order-date">${order.date}</div>
+            </div>
+            <div>${order.items.length} productos</div>
+            <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+            <div style="margin-top: 10px; font-weight: 600;">Total: $${order.total.toFixed(2)}</div>
+        `;
+        
+        ordersList.appendChild(orderElement);
+    });
+}
+
+// ===== PERFIL =====
+function loadProfile() {
+    userName.textContent = currentUser.name;
+    userEmail.textContent = currentUser.email;
+}
+
+// ===== NOTIFICACIONES =====
+function showNotification(title, message) {
+    let body = typeof message === 'string' ? message : (message.body || '');
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: body, icon: '/assets/icon-192.png' });
+    } else {
+        // Fallback para navegadores sin notificaciones
+        alert(`${title}: ${body}`);
+    }
+}
+
+// ===== MANEJO DE CONEXIÓN =====
+function updateOnlineStatus() {
+    isOnline = navigator.onLine;
+    const statusElement = document.getElementById('online-status');
+    
+    if (!statusElement) {
+        const status = document.createElement('div');
+        status.id = 'online-status';
+        status.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 1000;
+            background: ${isOnline ? '#10B981' : '#F59E0B'};
+            color: white;
+        `;
+        status.innerHTML = isOnline ? 
+            '<i class="fas fa-wifi"></i> En línea' : 
+            '<i class="fas fa-wifi-slash"></i> Sin conexión';
+        
+        document.body.appendChild(status);
+    } else {
+        statusElement.style.background = isOnline ? '#10B981' : '#F59E0B';
+        statusElement.innerHTML = isOnline ? 
+            '<i class="fas fa-wifi"></i> En línea' : 
+            '<i class="fas fa-wifi-slash"></i> Sin conexión';
+    }
+    
+    // Sincronizar si volvemos a tener conexión
+    if (isOnline) {
+        offlineManager.syncPendingOrders();
+    }
+}
+
+// ===== OFFLINE MANAGER =====
+class OfflineManager {
+    constructor() {
+        this.pendingOrders = JSON.parse(localStorage.getItem('pendingOrders')) || [];
+    }
+
+    addPendingOrder(order) {
+        this.pendingOrders.push({
+            ...order,
+            timestamp: Date.now(),
+            status: 'pending'
+        });
+        this.savePendingOrders();
+    }
+
+    savePendingOrders() {
+        localStorage.setItem('pendingOrders', JSON.stringify(this.pendingOrders));
+    }
+
+    async syncPendingOrders() {
+        if (!navigator.onLine) return;
+
+        for (const order of this.pendingOrders) {
+            try {
+                // Aquí iría la lógica para enviar los pedidos al servidor
+                console.log('Sincronizando pedido:', order);
+                
+                // Simulamos el envío
+                await this.sendOrderToServer(order);
+                
+                // Eliminamos el pedido de la lista de pendientes
+                this.pendingOrders = this.pendingOrders.filter(o => o.timestamp !== order.timestamp);
+                this.savePendingOrders();
+            } catch (error) {
+                console.error('Error sincronizando pedido:', error);
+            }
+        }
+    }
+
+    async sendOrderToServer(order) {
+        // Simulación de envío al servidor
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log('Pedido enviado al servidor:', order);
+                resolve();
+            }, 1000);
+        });
+    }
+}
+
+// Inicializar el manager offline
+const offlineManager = new OfflineManager();
+
+// ===== INICIALIZAR APLICACIÓN =====
 document.addEventListener('DOMContentLoaded', initApp);
+
+// Event listeners para conexión
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
