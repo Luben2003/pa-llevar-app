@@ -124,107 +124,49 @@ const categories = document.querySelectorAll('.category');
 
 // ===== FUNCIONES DE NAVEGACIÓN =====
 function showView(viewId) {
-    views.forEach(view => view.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-    
-    navItems.forEach(item => {
-        if (item.getAttribute('data-view') === viewId) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
+    document.querySelectorAll('.view').forEach(view => {
+        view.classList.remove('active');
     });
-    
-    // Acciones específicas para cada vista
-    if (viewId === 'cart-view') {
-        updateCartView();
-    } else if (viewId === 'orders-view') {
-        loadOrders();
-    } else if (viewId === 'profile-view') {
-        loadProfile();
-    } else if (viewId === 'home-view') {
-        renderRestaurants(restaurants);
-    }
+    const activeView = document.getElementById(viewId);
+    if (activeView) activeView.classList.add('active');
 }
+
+// Navegación inferior
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        const viewId = item.getAttribute('data-view');
+        showView(viewId);
+    });
+});
+
+// Botones de regreso (flecha)
+document.getElementById('back-button')?.addEventListener('click', () => showView('home-view'));
+document.getElementById('back-from-cart')?.addEventListener('click', () => showView('home-view'));
+document.getElementById('back-from-search')?.addEventListener('click', () => showView('home-view'));
+document.getElementById('back-from-orders')?.addEventListener('click', () => showView('home-view'));
+document.getElementById('back-from-profile')?.addEventListener('click', () => showView('home-view'));
+document.getElementById('back-to-home')?.addEventListener('click', () => showView('home-view'));
+
+// Ejemplo: mostrar productos al seleccionar restaurante
+// Debes tener una función que cargue los productos y luego:
+function openRestaurant(restaurantId) {
+    // ...carga productos del restaurante...
+    showView('products-view');
+}
+
+// Ejemplo: mostrar carrito
+document.getElementById('cart-count')?.addEventListener('click', () => showView('cart-view'));
+
+// Puedes agregar lógica similar para búsqueda, perfil, pedidos, etc.
+
+// Asegúrate de que solo una vista tenga la clase "active" al inicio:
+// <div id="home-view" class="view active">...</div>
+// Las demás: <div id="products-view" class="view">...</div>
 
 // ===== INICIALIZACIÓN =====
 function initApp() {
-    // Navegación inferior
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const viewId = item.getAttribute('data-view');
-            showView(viewId);
-        });
-    });
-    
-    // Botones de retroceso
-    backButton.addEventListener('click', () => showView('home-view'));
-    backFromCart.addEventListener('click', () => {
-        if (currentRestaurant) {
-            showView('products-view');
-        } else {
-            showView('home-view');
-        }
-    });
-    backFromSearch.addEventListener('click', () => showView('home-view'));
-    backFromOrders.addEventListener('click', () => showView('home-view'));
-    backFromProfile.addEventListener('click', () => showView('home-view'));
-    
-    // Botón de volver al inicio
-    backToHome.addEventListener('click', () => {
-        showView('home-view');
-    });
-    
-    // Botón de checkout
-    checkoutBtn.addEventListener('click', checkout);
-    
-    // Búsqueda
-    homeSearch.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        if (query.length > 2) {
-            showView('search-view');
-            searchInput.value = query;
-            performSearch(query);
-        }
-    });
-    
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        performSearch(query);
-    });
-    
-    // Ver todos los restaurantes
-    viewAllRestaurants.addEventListener('click', () => {
-        showView('search-view');
-        searchInput.value = '';
-        performSearch('');
-    });
-    
-    // Categorías
-    categories.forEach(category => {
-        category.addEventListener('click', () => {
-            const categoryName = category.getAttribute('data-category');
-            showView('search-view');
-            searchInput.value = categoryName;
-            performSearch(categoryName);
-        });
-    });
-    
-    // Cerrar sesión
-    logoutBtn.addEventListener('click', () => {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-            localStorage.removeItem('paLlevarCart');
-            localStorage.removeItem('paLlevarOrders');
-            localStorage.removeItem('paLlevarCurrentUser');
-            cart = [];
-            orders = [];
-            currentUser = null;
-            updateCartCount();
-            showView('home-view');
-            alert('Sesión cerrada correctamente');
-        }
-    });
-    
     // Inicializar vistas
     renderRestaurants(restaurants);
     updateCartCount();
