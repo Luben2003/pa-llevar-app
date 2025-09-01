@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Pa Llevar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Simple - Pa Llevar</h1>
+        
+        <div id="config-status" class="status info">Verificando configuración...</div>
+        <div id="supabase-status" class="status info">Verificando Supabase...</div>
+        <div id="test-result" class="status info">Esperando pruebas...</div>
+        
+        <button onclick="testConfig()">Test Config</button>
+        <button onclick="testSupabase()">Test Supabase</button>
+        <button onclick="testAuth()">Test Auth</button>
+        
+        <div id="logs" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 12px;"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        let logs = [];
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            document.getElementById('logs').textContent = logs.join('\n');
+        }
+        
+        function testConfig() {
+            addLog('Probando configuración...');
+            const statusDiv = document.getElementById('config-status');
+            
+            try {
+                if (typeof CONFIG === 'undefined') {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ CONFIG no está definido';
+                    addLog('ERROR: CONFIG no está definido');
+                    return;
+                }
+                
+                if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Credenciales de Supabase faltantes';
+                    addLog('ERROR: Credenciales faltantes');
+                    return;
+                }
+                
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Configuración OK';
+                addLog('SUCCESS: Configuración verificada');
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`);
+            }
+        }
+        
+        function testSupabase() {
+            addLog('Probando Supabase...');
+            const statusDiv = document.getElementById('supabase-status');
+            
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Supabase CDN no cargado';
+                    addLog('ERROR: Supabase CDN no cargado');
+                    return;
+                }
+                
+                const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+                
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Supabase inicializado';
+                addLog('SUCCESS: Supabase inicializado');
+                
+                // Guardar para uso posterior
+                window.supabaseClient = supabase;
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`);
+            }
+        }
+        
+        async function testAuth() {
+            addLog('Probando autenticación...');
+            const resultDiv = document.getElementById('test-result');
+            
+            try {
+                if (!window.supabaseClient) {
+                    resultDiv.className = 'status error';
+                    resultDiv.textContent = '❌ Supabase no inicializado';
+                    addLog('ERROR: Supabase no inicializado');
+                    return;
+                }
+                
+                resultDiv.className = 'status info';
+                resultDiv.textContent = '🔄 Probando login...';
+                
+                const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                    email: 'test@example.com',
+                    password: '123456'
+                });
+                
+                if (error) {
+                    resultDiv.className = 'status error';
+                    resultDiv.textContent = `❌ Error de auth: ${error.message}`;
+                    addLog(`ERROR: ${error.message}`);
+                } else {
+                    resultDiv.className = 'status success';
+                    resultDiv.textContent = `✅ Login exitoso: ${data.user.email}`;
+                    addLog(`SUCCESS: Login exitoso`);
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`);
+            }
+        }
+        
+        // Inicializar tests
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('Test iniciado');
+            testConfig();
+            testSupabase();
+        });
+    </script>
+</body>
+</html>

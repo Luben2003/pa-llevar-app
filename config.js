@@ -6,21 +6,21 @@ const CONFIG = {
     APP_DESCRIPTION: 'App de pedidos de comida a domicilio',
     
     // Configuración de Supabase
-    SUPABASE_URL: 'https://jbtpwzpdkxrgqaedduai.supabase.co', // Reemplaza con tu URL real
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpidHB3enBka3hyZ3FhZWRkdWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2OTM2MjIsImV4cCI6MjA3MjI2OTYyMn0._Kmq-AxZSntip4iO9FCQ1-7tKb_nRyot4HmnAsgFujw', // Reemplaza con tu anon key real
+    SUPABASE_URL: 'https://jbtpwzpdkxrgqaedduai.supabase.co',
+    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpidHB3enBka3hyZ3FhZWRkdWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2OTM2MjIsImV4cCI6MjA3MjI2OTYyMn0._Kmq-AxZSntip4iO9FCQ1-7tKb_nRyot4HmnAsgFujw',
     
     // Configuración de la API
     API_BASE_URL: 'https://api.pallevar.com',
-    API_TIMEOUT: 10000, // 10 segundos
+    API_TIMEOUT: 10000,
     
     // Configuración de envío
     SHIPPING_COST: 2.50,
-    TAX_RATE: 0.16, // 16% IVA
+    TAX_RATE: 0.16,
     MIN_ORDER_AMOUNT: 5.00,
     
     // Configuración de tiempo
     ESTIMATED_DELIVERY_TIME: '30-40 minutos',
-    SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 horas en ms
+    SESSION_TIMEOUT: 24 * 60 * 60 * 1000,
     
     // Configuración de UI
     ANIMATION_DURATION: 300,
@@ -28,14 +28,14 @@ const CONFIG = {
     MAX_SEARCH_RESULTS: 20,
     
     // Configuración de notificaciones
-    NOTIFICATION_DURATION: 5000, // 5 segundos
+    NOTIFICATION_DURATION: 5000,
     ENABLE_PUSH_NOTIFICATIONS: true,
     
     // Configuración de caché
     CACHE_DURATION: {
-        RESTAURANTS: 30 * 60 * 1000, // 30 minutos
-        PRODUCTS: 15 * 60 * 1000,    // 15 minutos
-        USER_PROFILE: 60 * 60 * 1000  // 1 hora
+        RESTAURANTS: 30 * 60 * 1000,
+        PRODUCTS: 15 * 60 * 1000,
+        USER_PROFILE: 60 * 60 * 1000
     },
     
     // Configuración de validación
@@ -90,7 +90,7 @@ const CONFIG = {
     
     // Configuración de desarrollo
     DEBUG: false,
-    LOG_LEVEL: 'info', // 'debug', 'info', 'warn', 'error'
+    LOG_LEVEL: 'info',
     
     // Configuración de PWA
     PWA: {
