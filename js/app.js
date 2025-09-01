@@ -831,9 +831,20 @@ function register() {
 // Cerrar sesión
 function logout() {
     localStorage.removeItem('paLlevarUser');
-    document.getElementById('logout-btn').style.display = 'none';
-    document.getElementById('home').style.display = 'none';
-    document.getElementById('login').style.display = 'block';
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.style.display = 'none';
+
+    // Corrige los IDs según tu HTML
+    const homeSection = document.getElementById('home');
+    if (homeSection) homeSection.style.display = 'none';
+
+    const loginSection = document.getElementById('login');
+    if (loginSection) loginSection.style.display = 'block';
+
+    // Si usas vistas con clase "view" y "active"
+    document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+    const loginView = document.getElementById('login-view');
+    if (loginView) loginView.classList.add('active');
 }
 
 // Listeners para registro y logout
