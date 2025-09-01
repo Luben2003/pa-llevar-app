@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login Fix - Pa Llevar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover { background: #0056b3; }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Test Login Fix - Pa Llevar</h1>
+        
+        <div id="status" class="status info">Iniciando pruebas...</div>
+        
+        <div class="test-section">
+            <h3>1. Verificar Configuración</h3>
+            <button onclick="checkConfig()">Verificar Config</button>
+            <div id="config-result" class="status info">Cargando...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Verificar Vistas</h3>
+            <button onclick="checkViews()">Verificar Vistas</button>
+            <div id="views-result" class="status info">Cargando...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Probar Cambio de Vistas</h3>
+            <button onclick="testViewChange('login-view')">Mostrar Login</button>
+            <button onclick="testViewChange('home-view')">Mostrar Home</button>
+            <button onclick="testViewChange('profile-view')">Mostrar Perfil</button>
+            <div id="view-change-result" class="status info">Cargando...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Probar App Principal</h3>
+            <button onclick="openMainApp()">Abrir App Principal</button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `status ${type}`;
+            element.textContent = message;
+        }
+        
+        function checkConfig() {
+            try {
+                if (typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL) {
+                    updateStatus('config-result', '✅ Configuración cargada correctamente', 'success');
+                } else {
+                    updateStatus('config-result', '❌ Error: Configuración no encontrada', 'error');
+                }
+            } catch (error) {
+                updateStatus('config-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkViews() {
+            try {
+                const views = ['home-view', 'login-view', 'profile-view', 'cart-view', 'search-view', 'orders-view'];
+                const results = [];
+                
+                views.forEach(viewName => {
+                    const element = document.getElementById(viewName);
+                    if (element) {
+                        results.push(`✅ ${viewName}`);
+                    } else {
+                        results.push(`❌ ${viewName} (no encontrado)`);
+                    }
+                });
+                
+                updateStatus('views-result', results.join('\n'), 'info');
+            } catch (error) {
+                updateStatus('views-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testViewChange(viewName) {
+            try {
+                if (typeof showView === 'function') {
+                    showView(viewName);
+                    updateStatus('view-change-result', `✅ Vista cambiada a: ${viewName}`, 'success');
+                } else {
+                    updateStatus('view-change-result', '❌ Función showView no disponible', 'error');
+                }
+            } catch (error) {
+                updateStatus('view-change-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function openMainApp() {
+            window.open('index.html', '_blank');
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('status', '✅ Test iniciado correctamente', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,13 +1,21 @@
 // ===== SERVICIOS DE SUPABASE =====
 
 // Inicializar cliente de Supabase
+console.log('🔧 Inicializando cliente Supabase...', { 
+    url: CONFIG.SUPABASE_URL, 
+    key: CONFIG.SUPABASE_ANON_KEY.substring(0, 20) + '...' 
+});
+
 const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+console.log('✅ Cliente Supabase inicializado');
 
 // ===== SERVICIOS DE AUTENTICACIÓN =====
 
 // Registrar nuevo usuario
 async function signUp(email, password, userData = {}) {
     try {
+        console.log('📝 Supabase signUp iniciado:', { email, userData });
+        
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
@@ -16,11 +24,13 @@ async function signUp(email, password, userData = {}) {
             }
         });
 
+        console.log('📡 Supabase signUp respuesta:', { data, error });
+
         if (error) throw error;
 
         return { success: true, data };
     } catch (error) {
-        console.error('Error en signUp:', error);
+        console.error('❌ Error en signUp:', error);
         return { success: false, error: error.message };
     }
 }
@@ -28,16 +38,20 @@ async function signUp(email, password, userData = {}) {
 // Iniciar sesión
 async function signIn(email, password) {
     try {
+        console.log('🔐 Supabase signIn iniciado:', { email });
+        
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password
         });
 
+        console.log('📡 Supabase signIn respuesta:', { data, error });
+
         if (error) throw error;
 
         return { success: true, data };
     } catch (error) {
-        console.error('Error en signIn:', error);
+        console.error('❌ Error en signIn:', error);
         return { success: false, error: error.message };
     }
 }
@@ -57,11 +71,34 @@ async function signOut() {
 // Obtener usuario actual
 async function getCurrentUser() {
     try {
+        console.log('🔍 Obteniendo usuario actual...');
+        
+        // Primero verificar si hay una sesión activa
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+            console.log('⚠️ Error obteniendo sesión:', sessionError.message);
+            return { success: false, error: sessionError.message };
+        }
+        
+        if (!session) {
+            console.log('ℹ️ No hay sesión activa');
+            return { success: false, user: null };
+        }
+        
+        // Si hay sesión, obtener el usuario
         const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) throw error;
+        
+        if (error) {
+            console.log('❌ Error obteniendo usuario:', error.message);
+            return { success: false, error: error.message };
+        }
+        
+        console.log('✅ Usuario obtenido:', user?.email);
         return { success: true, user };
+        
     } catch (error) {
-        console.error('Error en getCurrentUser:', error);
+        console.log('⚠️ Error en getCurrentUser (normal si no hay sesión):', error.message);
         return { success: false, error: error.message };
     }
 }

@@ -1003,6 +1003,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
 }
 
 #login-view .content {
@@ -1017,10 +1023,21 @@ body {
 
 /* Ocultar navegación inferior en login */
 #login-view ~ .bottom-nav {
-    display: none;
+    display: none !important;
 }
 
 /* Mostrar navegación inferior solo cuando no esté en login */
 .view:not(#login-view).active ~ .bottom-nav {
-    display: flex;
+    display: flex !important;
+}
+
+/* Asegurar que el login ocupe toda la pantalla */
+#login-view.active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: var(--neutral-light);
 }

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Auth - Pa Llevar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        
+        .logs {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+        }
+        
+        .step {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔍 Debug de Autenticación - Pa Llevar</h1>
+        
+        <div class="step">
+            <h3>1. Estado de la Configuración</h3>
+            <div id="config-status" class="status info">Verificando...</div>
+            <button onclick="checkConfig()">Verificar Config</button>
+        </div>
+        
+        <div class="step">
+            <h3>2. Estado de Supabase</h3>
+            <div id="supabase-status" class="status info">Verificando...</div>
+            <button onclick="checkSupabase()">Verificar Supabase</button>
+        </div>
+        
+        <div class="step">
+            <h3>3. Test de Registro</h3>
+            <form id="register-form" onsubmit="testRegister(event)">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="reg-name" value="Test User" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="reg-email" value="test@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña:</label>
+                    <input type="password" id="reg-password" value="123456" required>
+                </div>
+                <button type="submit">Probar Registro</button>
+            </form>
+            <div id="register-result" class="status info">Esperando...</div>
+        </div>
+        
+        <div class="step">
+            <h3>4. Test de Login</h3>
+            <form id="login-form" onsubmit="testLogin(event)">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="login-email" value="test@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña:</label>
+                    <input type="password" id="login-password" value="123456" required>
+                </div>
+                <button type="submit">Probar Login</button>
+            </form>
+            <div id="login-result" class="status info">Esperando...</div>
+        </div>
+        
+        <div class="step">
+            <h3>5. Logs Detallados</h3>
+            <button onclick="clearLogs()">Limpiar Logs</button>
+            <div id="logs" class="logs">Los logs aparecerán aquí...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    
+    <script>
+        let logs = [];
+        let supabaseClient = null;
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+            updateLogs();
+            console.log(logEntry);
+        }
+        
+        function updateLogs() {
+            document.getElementById('logs').textContent = logs.join('\n');
+            document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight;
+        }
+        
+        function clearLogs() {
+            logs = [];
+            updateLogs();
+        }
+        
+        function checkConfig() {
+            addLog('🔧 Verificando configuración...');
+            const statusDiv = document.getElementById('config-status');
+            
+            try {
+                if (typeof CONFIG === 'undefined') {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ CONFIG no está definido';
+                    addLog('ERROR: CONFIG no está definido', 'error');
+                    return;
+                }
+                
+                if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Credenciales de Supabase faltantes';
+                    addLog('ERROR: Credenciales faltantes', 'error');
+                    return;
+                }
+                
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Configuración OK';
+                addLog('SUCCESS: Configuración verificada');
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkSupabase() {
+            addLog('🔧 Verificando Supabase...');
+            const statusDiv = document.getElementById('supabase-status');
+            
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Supabase CDN no cargado';
+                    addLog('ERROR: Supabase CDN no cargado', 'error');
+                    return;
+                }
+                
+                supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+                
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Supabase inicializado';
+                addLog('SUCCESS: Supabase inicializado');
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testRegister(e) {
+            e.preventDefault();
+            addLog('🔄 Iniciando test de registro...');
+            
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const resultDiv = document.getElementById('register-result');
+            
+            resultDiv.className = 'status info';
+            resultDiv.textContent = '🔄 Registrando usuario...';
+            
+            try {
+                addLog(`📝 Intentando registrar: ${email}`);
+                
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: { name: name }
+                    }
+                });
+                
+                addLog(`📡 Respuesta de registro:`, 'info');
+                addLog(`   Data: ${JSON.stringify(data, null, 2)}`);
+                addLog(`   Error: ${error ? error.message : 'null'}`);
+                
+                if (error) {
+                    resultDiv.className = 'status error';
+                    resultDiv.textContent = `❌ Error: ${error.message}`;
+                    addLog(`❌ Error en registro: ${error.message}`, 'error');
+                } else {
+                    resultDiv.className = 'status success';
+                    resultDiv.textContent = `✅ Registro exitoso! Usuario: ${data.user.email}`;
+                    addLog(`✅ Registro exitoso: ${data.user.email}`, 'success');
+                    
+                    if (data.user.email_confirmed_at) {
+                        addLog('✅ Email confirmado automáticamente', 'success');
+                    } else {
+                        addLog('⚠️ Email requiere confirmación', 'warning');
+                    }
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`💥 Error inesperado: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLogin(e) {
+            e.preventDefault();
+            addLog('🔄 Iniciando test de login...');
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            resultDiv.className = 'status info';
+            resultDiv.textContent = '🔄 Iniciando sesión...';
+            
+            try {
+                addLog(`🔐 Intentando login: ${email}`);
+                
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                addLog(`📡 Respuesta de login:`, 'info');
+                addLog(`   Data: ${JSON.stringify(data, null, 2)}`);
+                addLog(`   Error: ${error ? error.message : 'null'}`);
+                
+                if (error) {
+                    resultDiv.className = 'status error';
+                    resultDiv.textContent = `❌ Error: ${error.message}`;
+                    addLog(`❌ Error en login: ${error.message}`, 'error');
+                } else {
+                    resultDiv.className = 'status success';
+                    resultDiv.textContent = `✅ Login exitoso! Usuario: ${data.user.email}`;
+                    addLog(`✅ Login exitoso: ${data.user.email}`, 'success');
+                    
+                    // Verificar sesión
+                    const { data: sessionData } = await supabaseClient.auth.getSession();
+                    addLog(`🔑 Sesión activa: ${sessionData.session ? 'Sí' : 'No'}`);
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`💥 Error inesperado: ${error.message}`, 'error');
+            }
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('🚀 Debug de autenticación iniciado');
+            checkConfig();
+            checkSupabase();
+        });
+        
+        // Capturar errores globales
+        window.addEventListener('error', (event) => {
+            addLog(`💥 ERROR GLOBAL: ${event.error.message}`, 'error');
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            addLog(`💥 PROMISE REJECTED: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>

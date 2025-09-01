@@ -18,22 +18,25 @@ const DOM = {
 };
 
 // Inicializar la aplicación
-function initApp() {
+async function initApp() {
     console.log('🚀 Iniciando Pa Llevar...');
     
-    // Cargar elementos DOM
-    loadDOMElements();
-    
-    // Configurar event listeners
-    setupEventListeners();
-    
-    // Verificar autenticación
-    checkAuthentication();
-    
-    // Mostrar vista inicial
-    showView('login-view');
-    
-    console.log('✅ Aplicación iniciada correctamente');
+    try {
+        // Cargar elementos DOM
+        loadDOMElements();
+        
+        // Configurar event listeners
+        setupEventListeners();
+        
+        // Verificar autenticación de forma asíncrona
+        await checkAuthentication();
+        
+        console.log('✅ Aplicación iniciada correctamente');
+    } catch (error) {
+        console.error('❌ Error iniciando aplicación:', error);
+        // Asegurar que siempre se muestre la vista de login
+        showView('login-view');
+    }
 }
 
 // Cargar elementos DOM
@@ -170,12 +173,15 @@ async function handleLogin(e) {
     }
     
     try {
+        console.log('🔄 Iniciando login...', { email });
         showLoading(document.body, 'Iniciando sesión...');
         
         // Login con Supabase
         const result = await SupabaseService.signIn(email, password);
+        console.log('📡 Respuesta de Supabase:', result);
         
         if (result.success) {
+            console.log('✅ Login exitoso:', result.data.user);
             // Login exitoso
             AppState.currentUser = {
                 id: result.data.user.id,
@@ -197,13 +203,16 @@ async function handleLogin(e) {
             // Cambiar a vista principal
             showView('home-view');
         } else {
+            console.log('❌ Error en login:', result.error);
             // Error en login
             showError('login', result.error || 'Error al iniciar sesión');
         }
         
     } catch (error) {
+        console.error('💥 Error en handleLogin:', error);
         handleError(error, 'login');
     } finally {
+        console.log('🏁 Finalizando login...');
         hideLoading();
     }
 }
@@ -233,12 +242,15 @@ async function handleRegister(e) {
     }
     
     try {
+        console.log('🔄 Iniciando registro...', { email, name });
         showLoading(document.body, 'Creando cuenta...');
         
         // Registro con Supabase
         const result = await SupabaseService.signUp(email, password, { name });
+        console.log('📡 Respuesta de Supabase:', result);
         
         if (result.success) {
+            console.log('✅ Registro exitoso:', result.data.user);
             // Registro exitoso
             AppState.currentUser = {
                 id: result.data.user.id,
@@ -260,13 +272,16 @@ async function handleRegister(e) {
             // Cambiar a vista principal
             showView('home-view');
         } else {
+            console.log('❌ Error en registro:', result.error);
             // Error en registro
             showError('register', result.error || 'Error al crear la cuenta');
         }
         
     } catch (error) {
+        console.error('💥 Error en handleRegister:', error);
         handleError(error, 'register');
     } finally {
+        console.log('🏁 Finalizando registro...');
         hideLoading();
     }
 }
@@ -338,6 +353,8 @@ function handleCategoryClick(category) {
 
 // Mostrar vista
 function showView(viewName) {
+    console.log('🔄 Cambiando a vista:', viewName);
+    
     // Ocultar todas las vistas
     Object.values(DOM.views).forEach(view => {
         if (view) {
@@ -352,10 +369,21 @@ function showView(viewName) {
         AppState.currentView = viewName;
     }
     
-    // Actualizar navegación si es necesario
-    if (viewName !== 'login-view' && viewName !== 'confirmation-view') {
-        updateActiveNavItem(viewName);
+    // Manejar navegación inferior
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav) {
+        if (viewName === 'login-view') {
+            bottomNav.style.display = 'none';
+        } else {
+            bottomNav.style.display = 'flex';
+            // Actualizar navegación si es necesario
+            if (viewName !== 'confirmation-view') {
+                updateActiveNavItem(viewName);
+            }
+        }
     }
+    
+    console.log('✅ Vista activa:', viewName);
 }
 
 // Actualizar elemento activo en navegación
@@ -371,10 +399,14 @@ function updateActiveNavItem(viewName) {
 // Verificar autenticación
 async function checkAuthentication() {
     try {
+        console.log('🔍 Verificando autenticación...');
+        
         // Verificar sesión actual con Supabase
         const result = await SupabaseService.getCurrentUser();
+        console.log('📡 Resultado de verificación:', result);
         
         if (result.success && result.user) {
+            console.log('✅ Usuario autenticado:', result.user.email);
             AppState.currentUser = {
                 id: result.user.id,
                 name: result.user.user_metadata?.name || result.user.email.split('@')[0],
@@ -383,11 +415,17 @@ async function checkAuthentication() {
             AppState.isAuthenticated = true;
             showView('home-view');
         } else {
+            console.log('ℹ️ No hay sesión activa, mostrando login');
             // No hay sesión activa, mostrar login
+            AppState.isAuthenticated = false;
+            AppState.currentUser = null;
             showView('login-view');
         }
     } catch (error) {
-        console.error('Error verificando autenticación:', error);
+        console.log('⚠️ Error verificando autenticación (normal si no hay sesión):', error.message);
+        // Es normal que haya error si no hay sesión activa
+        AppState.isAuthenticated = false;
+        AppState.currentUser = null;
         showView('login-view');
     }
 }
