@@ -82,15 +82,10 @@ const restaurants = [
     }
 ];
 
-// ===== ESTADO DE LA APLICACIÓN =====
+// ===== ESTADO DE LA APP =====
 let cart = JSON.parse(localStorage.getItem('paLlevarCart')) || [];
 let orders = JSON.parse(localStorage.getItem('paLlevarOrders')) || [];
 let currentRestaurant = null;
-let currentUser = JSON.parse(localStorage.getItem('paLlevarCurrentUser')) || {
-    name: "Usuario Ejemplo",
-    email: "usuario@ejemplo.com"
-};
-let isOnline = navigator.onLine;
 
 // ===== ELEMENTOS DOM =====
 const views = document.querySelectorAll('.view');
@@ -124,106 +119,78 @@ const categories = document.querySelectorAll('.category');
 
 // ===== FUNCIONES DE NAVEGACIÓN =====
 function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => {
-        view.classList.remove('active');
+    views.forEach(view => view.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    navItems.forEach(item => {
+        if (item.getAttribute('data-view') === viewId) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
     });
-    const activeView = document.getElementById(viewId);
-    if (activeView) activeView.classList.add('active');
+    if (viewId === 'cart-view') updateCartView();
+    if (viewId === 'orders-view') loadOrders();
+    if (viewId === 'profile-view') loadProfile();
+    if (viewId === 'home-view') renderRestaurants(restaurants);
 }
-
-// Navegación inferior
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        const viewId = item.getAttribute('data-view');
-        showView(viewId);
-    });
-});
-
-// Botones de regreso (flecha)
-document.getElementById('back-button')?.addEventListener('click', () => showView('home-view'));
-document.getElementById('back-from-cart')?.addEventListener('click', () => showView('home-view'));
-document.getElementById('back-from-search')?.addEventListener('click', () => showView('home-view'));
-document.getElementById('back-from-orders')?.addEventListener('click', () => showView('home-view'));
-document.getElementById('back-from-profile')?.addEventListener('click', () => showView('home-view'));
-document.getElementById('back-to-home')?.addEventListener('click', () => showView('home-view'));
-
-// Ejemplo: mostrar productos al seleccionar restaurante
-// Debes tener una función que cargue los productos y luego:
-function openRestaurant(restaurantId) {
-    // ...carga productos del restaurante...
-    showView('products-view');
-}
-
-// Ejemplo: mostrar carrito
-document.getElementById('cart-count')?.addEventListener('click', () => showView('cart-view'));
-
-// Puedes agregar lógica similar para búsqueda, perfil, pedidos, etc.
-
-// Asegúrate de que solo una vista tenga la clase "active" al inicio:
-// <div id="home-view" class="view active">...</div>
-// Las demás: <div id="products-view" class="view">...</div>
 
 // ===== INICIALIZACIÓN =====
 function initApp() {
-    // Inicializar vistas
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const viewId = item.getAttribute('data-view');
+            showView(viewId);
+        });
+    });
+    backButton?.addEventListener('click', () => showView('home-view'));
+    backFromCart?.addEventListener('click', () => currentRestaurant ? showView('products-view') : showView('home-view'));
+    backFromSearch?.addEventListener('click', () => showView('home-view'));
+    backFromOrders?.addEventListener('click', () => showView('home-view'));
+    backFromProfile?.addEventListener('click', () => showView('home-view'));
+    backToHome?.addEventListener('click', () => showView('home-view'));
+    checkoutBtn?.addEventListener('click', checkout);
+    homeSearch?.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query.length > 2) {
+            showView('search-view');
+            searchInput.value = query;
+            performSearch(query);
+        }
+    });
+    searchInput?.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        performSearch(query);
+    });
+    viewAllRestaurants?.addEventListener('click', () => {
+        showView('search-view');
+        searchInput.value = '';
+        performSearch('');
+    });
+    categories.forEach(category => {
+        category.addEventListener('click', () => {
+            const categoryName = category.getAttribute('data-category');
+            showView('search-view');
+            searchInput.value = categoryName;
+            performSearch(categoryName);
+        });
+    });
+    logoutBtn?.addEventListener('click', () => {
+        localStorage.removeItem('paLlevarCart');
+        localStorage.removeItem('paLlevarOrders');
+        cart = [];
+        orders = [];
+        updateCartCount();
+        showView('home-view');
+        alert('Sesión cerrada correctamente');
+    });
     renderRestaurants(restaurants);
     updateCartCount();
     loadProfile();
-    updateOnlineStatus();
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        // Navegación entre secciones
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const section = btn.dataset.section;
-                document.querySelectorAll('.section').forEach(sec => {
-                    sec.style.display = 'none';
-                });
-                const activeSection = document.getElementById(section);
-                if (activeSection) activeSection.style.display = 'block';
-            });
-        });
-
-        // Botones de productos
-        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productId = parseInt(btn.dataset.productId);
-                addToCart(productId);
-            });
-        });
-
-        // Botón de finalizar compra
-        const checkoutBtn = document.getElementById('checkout-btn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                checkout();
-            });
-        }
-
-        // Botón de vaciar carrito
-        const clearCartBtn = document.getElementById('clear-cart-btn');
-        if (clearCartBtn) {
-            clearCartBtn.addEventListener('click', () => {
-                clearCart();
-            });
-        }
-
-        // Botón de inicio de sesión
-        const loginBtn = document.getElementById('login-btn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', () => {
-                login();
-            });
-        }
-    });
 }
 
 // ===== RENDERIZADO DE RESTAURANTES =====
 function renderRestaurants(restaurantsToRender) {
     restaurantsList.innerHTML = '';
-    
     restaurantsToRender.forEach(restaurant => {
         const restaurantElement = document.createElement('div');
         restaurantElement.className = 'restaurant-card';
@@ -241,11 +208,7 @@ function renderRestaurants(restaurantsToRender) {
                 </div>
             </div>
         `;
-        
-        restaurantElement.addEventListener('click', () => {
-            openRestaurant(restaurant.id);
-        });
-        
+        restaurantElement.addEventListener('click', () => openRestaurant(restaurant.id));
         restaurantsList.appendChild(restaurantElement);
     });
 }
@@ -264,7 +227,6 @@ function openRestaurant(restaurantId) {
 // ===== RENDERIZADO DE PRODUCTOS =====
 function renderProducts(products) {
     productList.innerHTML = '';
-    
     products.forEach(product => {
         const productElement = document.createElement('div');
         productElement.className = 'product-card';
@@ -281,13 +243,11 @@ function renderProducts(products) {
                 </div>
             </div>
         `;
-        
         productElement.querySelector('.add-to-cart').addEventListener('click', (e) => {
             const productId = parseInt(e.target.getAttribute('data-id'));
             addToCart(productId);
             e.stopPropagation();
         });
-        
         productList.appendChild(productElement);
     });
 }
@@ -299,10 +259,8 @@ function addToCart(productId) {
         product = restaurant.products.find(p => p.id === productId);
         if (product) break;
     }
-    
     if (product) {
         const existingItem = cart.find(item => item.id === productId);
-        
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
@@ -315,16 +273,13 @@ function addToCart(productId) {
                 restaurant: currentRestaurant.name
             });
         }
-        
         updateCartCount();
         saveCart();
-        
         // Feedback visual
         const button = document.querySelector(`.add-to-cart[data-id="${productId}"]`);
         const originalText = button.textContent;
         button.textContent = "✓ Añadido";
         button.style.backgroundColor = '#4caf50';
-        
         setTimeout(() => {
             button.textContent = originalText;
             button.style.backgroundColor = '';
@@ -343,7 +298,6 @@ function saveCart() {
 
 function updateCartView() {
     cartItems.innerHTML = '';
-    
     if (cart.length === 0) {
         cartItems.innerHTML = '<p class="no-results"><i class="fas fa-shopping-cart"></i>Tu carrito está vacío</p>';
         checkoutBtn.disabled = true;
@@ -351,7 +305,6 @@ function updateCartView() {
     } else {
         checkoutBtn.disabled = false;
         checkoutBtn.style.opacity = '1';
-        
         cart.forEach(item => {
             const cartItemElement = document.createElement('div');
             cartItemElement.className = 'cart-item';
@@ -370,7 +323,6 @@ function updateCartView() {
                     <button class="quantity-btn plus" data-id="${item.id}">+</button>
                 </div>
             `;
-            
             cartItemElement.querySelector('.plus').addEventListener('click', () => {
                 const itemIndex = cart.findIndex(i => i.id === item.id);
                 if (itemIndex !== -1) {
@@ -380,7 +332,6 @@ function updateCartView() {
                     saveCart();
                 }
             });
-            
             cartItemElement.querySelector('.minus').addEventListener('click', () => {
                 const itemIndex = cart.findIndex(i => i.id === item.id);
                 if (itemIndex !== -1) {
@@ -393,17 +344,14 @@ function updateCartView() {
                     saveCart();
                 }
             });
-            
             cartItems.appendChild(cartItemElement);
         });
     }
-    
     // Actualizar totales
     const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     const tax = subtotal * 0.1;
     const shipping = subtotal > 0 ? 2.5 : 0;
     const total = subtotal + tax + shipping;
-    
     subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
     taxEl.textContent = `$${tax.toFixed(2)}`;
     shippingEl.textContent = shipping > 0 ? `$${shipping.toFixed(2)}` : 'Gratis';
@@ -415,7 +363,6 @@ function checkout() {
         showNotification('Carrito vacío', 'Agrega productos antes de continuar');
         return;
     }
-    
     const order = {
         id: Date.now(),
         date: new Date().toLocaleDateString(),
@@ -426,62 +373,20 @@ function checkout() {
         total: cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 1.1 + 2.5,
         status: 'Preparando'
     };
-    
-    if (isOnline) {
-        // Enviar al servidor
-        sendOrderToServer(order)
-            .then(() => {
-                orders.unshift(order);
-                saveOrders();
-                completeCheckout(order);
-            })
-            .catch(() => {
-                // Fallback offline
-                offlineManager.addPendingOrder(order);
-                completeCheckout(order);
-            });
-    } else {
-        // Modo offline
-        offlineManager.addPendingOrder(order);
-        completeCheckout(order);
-        showNotification('Pedido en modo offline', 'Se enviará cuando tengas conexión');
-    }
-}
-
-function completeCheckout(order) {
+    orders.unshift(order);
+    localStorage.setItem('paLlevarOrders', JSON.stringify(orders));
     cart = [];
     saveCart();
     updateCartCount();
     orderNumber.textContent = order.id;
     showView('confirmation-view');
-    
-    // Mostrar notificación
-    showNotification('¡Pedido Confirmado!', {
-        body: `Tu pedido #${order.id} está siendo preparado`,
-        icon: '/assets/icon-192.png'
-    });
-}
-
-async function sendOrderToServer(order) {
-    // Simulación de envío al servidor
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // Simular fallo aleatorio (20% de probabilidad)
-            if (Math.random() < 0.8) {
-                resolve();
-            } else {
-                reject(new Error('Error de conexión'));
-            }
-        }, 1000);
-    });
+    showNotification('¡Pedido Confirmado!', `Tu pedido #${order.id} está siendo preparado`);
 }
 
 // ===== BÚSQUEDA =====
 function performSearch(query) {
     searchResults.innerHTML = '';
-    
     if (query === '') {
-        // Mostrar todos los restaurantes si no hay query
         restaurants.forEach(restaurant => {
             const restaurantElement = document.createElement('div');
             restaurantElement.className = 'restaurant-card';
@@ -499,24 +404,16 @@ function performSearch(query) {
                     </div>
                 </div>
             `;
-            
-            restaurantElement.addEventListener('click', () => {
-                openRestaurant(restaurant.id);
-            });
-            
+            restaurantElement.addEventListener('click', () => openRestaurant(restaurant.id));
             searchResults.appendChild(restaurantElement);
         });
         return;
     }
-    
-    // Buscar restaurantes
     const restaurantResults = restaurants.filter(restaurant => 
         restaurant.name.toLowerCase().includes(query) || 
         restaurant.category.toLowerCase().includes(query) ||
-        restaurant.tags.some(tag => tag.includes(query))
+        restaurant.tags?.some(tag => tag.includes(query))
     );
-    
-    // Buscar productos
     const productResults = [];
     restaurants.forEach(restaurant => {
         restaurant.products.forEach(product => {
@@ -530,8 +427,6 @@ function performSearch(query) {
             }
         });
     });
-    
-    // Mostrar resultados
     if (restaurantResults.length === 0 && productResults.length === 0) {
         searchResults.innerHTML = `
             <div class="no-results">
@@ -541,14 +436,11 @@ function performSearch(query) {
         `;
         return;
     }
-    
-    // Mostrar restaurantes encontrados
     if (restaurantResults.length > 0) {
         const title = document.createElement('div');
         title.className = 'section-title';
         title.innerHTML = '<span>Restaurantes</span>';
         searchResults.appendChild(title);
-        
         restaurantResults.forEach(restaurant => {
             const restaurantElement = document.createElement('div');
             restaurantElement.className = 'restaurant-card';
@@ -566,22 +458,15 @@ function performSearch(query) {
                     </div>
                 </div>
             `;
-            
-            restaurantElement.addEventListener('click', () => {
-                openRestaurant(restaurant.id);
-            });
-            
+            restaurantElement.addEventListener('click', () => openRestaurant(restaurant.id));
             searchResults.appendChild(restaurantElement);
         });
     }
-    
-    // Mostrar productos encontrados
     if (productResults.length > 0) {
         const title = document.createElement('div');
         title.className = 'section-title';
         title.innerHTML = '<span>Productos</span>';
         searchResults.appendChild(title);
-        
         productResults.forEach(product => {
             const productElement = document.createElement('div');
             productElement.className = 'product-card';
@@ -599,21 +484,16 @@ function performSearch(query) {
                     </div>
                 </div>
             `;
-            
             productElement.querySelector('.add-to-cart').addEventListener('click', (e) => {
                 const productId = parseInt(e.target.getAttribute('data-id'));
                 const restaurantId = parseInt(e.target.getAttribute('data-restaurant'));
-                
-                // Abrir el restaurante primero
                 const restaurant = restaurants.find(r => r.id === restaurantId);
                 if (restaurant) {
                     currentRestaurant = restaurant;
                     addToCart(productId);
                 }
-                
                 e.stopPropagation();
             });
-            
             searchResults.appendChild(productElement);
         });
     }
@@ -622,7 +502,6 @@ function performSearch(query) {
 // ===== PEDIDOS =====
 function loadOrders() {
     ordersList.innerHTML = '';
-    
     if (orders.length === 0) {
         ordersList.innerHTML = `
             <div class="no-results">
@@ -632,7 +511,6 @@ function loadOrders() {
         `;
         return;
     }
-    
     orders.forEach(order => {
         const orderElement = document.createElement('div');
         orderElement.className = 'order-card';
@@ -645,119 +523,26 @@ function loadOrders() {
             <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
             <div style="margin-top: 10px; font-weight: 600;">Total: $${order.total.toFixed(2)}</div>
         `;
-        
         ordersList.appendChild(orderElement);
     });
 }
 
 // ===== PERFIL =====
 function loadProfile() {
-    userName.textContent = currentUser.name;
-    userEmail.textContent = currentUser.email;
+    userName.textContent = "Usuario Ejemplo";
+    userEmail.textContent = "usuario@ejemplo.com";
 }
 
 // ===== NOTIFICACIONES =====
 function showNotification(title, message) {
-    let body = typeof message === 'string' ? message : (message.body || '');
     if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(title, { body: body, icon: '/assets/icon-192.png' });
+        new Notification(title, { body: message, icon: '/assets/icon-192.png' });
     } else {
-        // Fallback para navegadores sin notificaciones
-        alert(`${title}: ${body}`);
+        alert(`${title}: ${message}`);
     }
 }
 
-// ===== MANEJO DE CONEXIÓN =====
-function updateOnlineStatus() {
-    isOnline = navigator.onLine;
-    const statusElement = document.getElementById('online-status');
-    
-    if (!statusElement) {
-        const status = document.createElement('div');
-        status.id = 'online-status';
-        status.style.cssText = `
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            z-index: 1000;
-            background: ${isOnline ? '#10B981' : '#F59E0B'};
-            color: white;
-        `;
-        status.innerHTML = isOnline ? 
-            '<i class="fas fa-wifi"></i> En línea' : 
-            '<i class="fas fa-wifi-slash"></i> Sin conexión';
-        
-        document.body.appendChild(status);
-    } else {
-        statusElement.style.background = isOnline ? '#10B981' : '#F59E0B';
-        statusElement.innerHTML = isOnline ? 
-            '<i class="fas fa-wifi"></i> En línea' : 
-            '<i class="fas fa-wifi-slash"></i> Sin conexión';
-    }
-    
-    // Sincronizar si volvemos a tener conexión
-    if (isOnline) {
-        offlineManager.syncPendingOrders();
-    }
-}
-
-// ===== OFFLINE MANAGER =====
-class OfflineManager {
-    constructor() {
-        this.pendingOrders = JSON.parse(localStorage.getItem('pendingOrders')) || [];
-    }
-
-    addPendingOrder(order) {
-        this.pendingOrders.push({
-            ...order,
-            timestamp: Date.now(),
-            status: 'pending'
-        });
-        this.savePendingOrders();
-    }
-
-    savePendingOrders() {
-        localStorage.setItem('pendingOrders', JSON.stringify(this.pendingOrders));
-    }
-
-    async syncPendingOrders() {
-        if (!navigator.onLine) return;
-
-        for (const order of this.pendingOrders) {
-            try {
-                // Aquí iría la lógica para enviar los pedidos al servidor
-                console.log('Sincronizando pedido:', order);
-                
-                // Simulamos el envío
-                await this.sendOrderToServer(order);
-                
-                // Eliminamos el pedido de la lista de pendientes
-                this.pendingOrders = this.pendingOrders.filter(o => o.timestamp !== order.timestamp);
-                this.savePendingOrders();
-            } catch (error) {
-                console.error('Error sincronizando pedido:', error);
-            }
-        }
-    }
-
-    async sendOrderToServer(order) {
-        // Simulación de envío al servidor
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('Pedido enviado al servidor:', order);
-                resolve();
-            }, 1000);
-        });
-    }
-}
-
-// Inicializar el manager offline
-const offlineManager = new OfflineManager();
-
-// ===== INICIALIZAR APLICACIÓN =====
+// ===== INICIALIZAR APP =====
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Event listeners para conexión

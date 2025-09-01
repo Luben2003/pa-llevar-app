@@ -4,18 +4,23 @@
   "description": "App de pedidos de comida a domicilio",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ff7b00",
+  "background_color": "#F0F2F8",
+  "theme_color": "#2D5BFF",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "images/icon-192.png",
+      "src": "assets/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "images/icon-512.png",
+      "src": "assets/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["food", "lifestyle", "shopping"],
+  "lang": "es"
 }

@@ -33,14 +33,22 @@
 
 body {
     font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--neutral-light);
-    color: var(--neutral);
-    line-height: 1.6;
+    background: #F0F2F8;
+    color: #2D2D4D;
+    margin: 0;
+    padding: 0;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 420px;
+    margin: auto;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+    position: relative;
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
 }
 
 /* ===== ESTRUCTURA PRINCIPAL ===== */
@@ -814,7 +822,7 @@ body {
     }
 }
 
-/* ===== MEJORAS DE ACCESIBILIDAD ===== */
+/* ===== ACCESIBILIDAD Y ANIMACIONES ===== */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -823,25 +831,58 @@ body {
     }
 }
 
-/* Mejoras de contraste para accesibilidad */
-.high-contrast {
-    --neutral-light: #FFFFFF;
-    --card-bg: #FAFAFA;
-    --border: #CCCCCC;
-    --neutral: #333333;
-    --neutral-dark: #000000;
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1A1A2E;
+        color: #E2E8F0;
+    }
+    .app-container {
+        background: #2D2D4D;
+    }
 }
 
-/* Modo oscuro */
-@media (prefers-color-scheme: dark) {
-    .dark-mode {
-        --neutral-light: #1A1A2E;
-        --card-bg: #2D2D4D;
-        --border: #4A4A6D;
-        --neutral: #E2E8F0;
-        --neutral-dark: #FFFFFF;
-        --neutral-medium: #A0AEC0;
+/* ===== SCROLL PERSONALIZADO ===== */
+.content::-webkit-scrollbar {
+    width: 6px;
+}
+.content::-webkit-scrollbar-thumb {
+    background: #5A7AFF;
+    border-radius: 3px;
+}
+
+/* ===== NOTIFICACIÓN OFFLINE ===== */
+.offline-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #F59E0B;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    z-index: 2000;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+/* ===== ANIMACIÓN DE TARJETAS ===== */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.restaurant-card, .product-card, .order-card {
+    animation: fadeInScale 0.5s ease-out;
 }
 
 /* ===== ESTADOS DE CARGA ===== */
@@ -866,25 +907,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* ===== OFFLINE SUPPORT ===== */
-.offline-notification {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--warning);
-    color: white;
-    text-align: center;
-    padding: 10px;
-    z-index: 2000;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
-}
-
 /* ===== MEJORAS DE FORMULARIOS ===== */
 .input-error {
     border-color: var(--error) !important;
@@ -896,38 +918,4 @@ body {
     font-size: 0.8rem;
     margin-top: 0.5rem;
     display: none;
-}
-
-/* ===== ANIMACIONES MEJORADAS ===== */
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.restaurant-card, .product-card, .order-card {
-    animation: fadeInScale 0.5s ease-out;
-}
-
-/* ===== SCROLL PERSONALIZADO ===== */
-.content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.content::-webkit-scrollbar-track {
-    background: var(--neutral-light);
-}
-
-.content::-webkit-scrollbar-thumb {
-    background: var(--primary-light);
-    border-radius: 3px;
-}
-
-.content::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
 }
