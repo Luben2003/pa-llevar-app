@@ -230,6 +230,52 @@ function initApp() {
     updateCartCount();
     loadProfile();
     updateOnlineStatus();
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // Navegación entre secciones
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                document.querySelectorAll('.section').forEach(sec => {
+                    sec.style.display = 'none';
+                });
+                const activeSection = document.getElementById(section);
+                if (activeSection) activeSection.style.display = 'block';
+            });
+        });
+
+        // Botones de productos
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const productId = parseInt(btn.dataset.productId);
+                addToCart(productId);
+            });
+        });
+
+        // Botón de finalizar compra
+        const checkoutBtn = document.getElementById('checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => {
+                checkout();
+            });
+        }
+
+        // Botón de vaciar carrito
+        const clearCartBtn = document.getElementById('clear-cart-btn');
+        if (clearCartBtn) {
+            clearCartBtn.addEventListener('click', () => {
+                clearCart();
+            });
+        }
+
+        // Botón de inicio de sesión
+        const loginBtn = document.getElementById('login-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                login();
+            });
+        }
+    });
 }
 
 // ===== RENDERIZADO DE RESTAURANTES =====
@@ -775,3 +821,103 @@ document.addEventListener('DOMContentLoaded', initApp);
 // Event listeners para conexión
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
+
+// Usuarios registrados (simulado en localStorage)
+function getUsers() {
+    return JSON.parse(localStorage.getItem('paLlevarUsers') || '[]');
+}
+function saveUsers(users) {
+    localStorage.setItem('paLlevarUsers', JSON.stringify(users));
+}
+
+// Login mejorado
+function login() {
+    const userInput = document.getElementById('username');
+    const passInput = document.getElementById('password');
+    const loginSection = document.getElementById('login');
+    if (userInput && passInput) {
+        const username = userInput.value.trim();
+        const password = passInput.value.trim();
+
+        if (!username || !password) {
+            alert('Por favor ingresa usuario y contraseña.');
+            return;
+        }
+
+        const users = getUsers();
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            alert('¡Bienvenido, ' + username + '!');
+            localStorage.setItem('paLlevarUser', username);
+            loginSection.style.display = 'none';
+            document.getElementById('home').style.display = 'block';
+            document.getElementById('logout-btn').style.display = 'inline-block';
+        } else {
+            alert('Usuario o contraseña incorrectos.');
+        }
+    }
+}
+
+// Registro de usuario
+function register() {
+    const newUserInput = document.getElementById('new-username');
+    const newPassInput = document.getElementById('new-password');
+    if (newUserInput && newPassInput) {
+        const username = newUserInput.value.trim();
+        const password = newPassInput.value.trim();
+
+        if (!username || !password) {
+            alert('Por favor ingresa usuario y contraseña para registrarte.');
+            return;
+        }
+
+        let users = getUsers();
+        if (users.find(u => u.username === username)) {
+            alert('El usuario ya existe.');
+            return;
+        }
+
+        users.push({ username, password });
+        saveUsers(users);
+        alert('Usuario registrado con éxito. Ahora puedes iniciar sesión.');
+        newUserInput.value = '';
+        newPassInput.value = '';
+    }
+}
+
+// Cerrar sesión
+function logout() {
+    localStorage.removeItem('paLlevarUser');
+    document.getElementById('logout-btn').style.display = 'none';
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('login').style.display = 'block';
+}
+
+// Listeners para registro y logout
+document.addEventListener('DOMContentLoaded', () => {
+    const registerBtn = document.getElementById('register-btn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', () => {
+            register();
+        });
+    }
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            logout();
+        });
+    }
+
+    // Mostrar login o home según sesión
+    const currentUser = localStorage.getItem('paLlevarUser');
+    if (currentUser) {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('home').style.display = 'block';
+        document.getElementById('logout-btn').style.display = 'inline-block';
+    } else {
+        document.getElementById('login').style.display = 'block';
+        document.getElementById('home').style.display = 'none';
+        document.getElementById('logout-btn').style.display = 'none';
+    }
+});

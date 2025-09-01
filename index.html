@@ -5,592 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pa Llevar - App de Comida</title>
     <meta name="description" content="App de pedidos de comida a domicilio">
+    <meta name="theme-color" content="#2D5BFF">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Variables de colores - Tema moderno y elegante */
-        :root {
-            --primary: #2D5BFF;
-            --primary-dark: #1A46E0;
-            --primary-light: #5A7AFF;
-            --secondary: #00C2A9;
-            --accent: #FF4B8B;
-            --neutral-dark: #1A1A2E;
-            --neutral: #2D2D4D;
-            --neutral-medium: #4A4A6D;
-            --neutral-light: #F0F2F8;
-            --card-bg: #FFFFFF;
-            --border: #E2E8F0;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --error: #EF4444;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.1);
-            --gradient-primary: linear-gradient(135deg, #2D5BFF 0%, #5A7AFF 100%);
-            --gradient-secondary: linear-gradient(135deg, #00C2A9 0%, #00E0C2 100%);
-            --gradient-accent: linear-gradient(135deg, #FF4B8B 0%, #FF80AB 100%);
-        }
-
-        /* Estilos generales */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
-            color: var(--neutral);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* Status bar solo para móviles */
-        .status-bar {
-            display: none; /* Ocultamos la barra de estado en desktop */
-        }
-
-        /* Contenedor principal */
-        .app-container {
-            max-width: 100%;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: var(--card-bg);
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Vistas */
-        .view {
-            display: none;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .view.active {
-            display: flex;
-        }
-
-        /* Header */
-        header {
-            background: var(--neutral-dark);
-            color: white;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-
-        .logo i {
-            font-size: 1.6rem;
-            color: var(--primary-light);
-        }
-
-        .header-icons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .icon-btn {
-            background: rgba(255, 255, 255, 0.12);
-            border: none;
-            color: white;
-            font-size: 1.25rem;
-            cursor: pointer;
-            width: 2.6rem;
-            height: 2.6rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.08);
-        }
-
-        /* Barra de búsqueda */
-        .search-bar {
-            padding: 1.25rem;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .search-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3.25rem;
-            border-radius: 1rem;
-            border: 1.5px solid var(--border);
-            font-size: 1rem;
-            background: var(--card-bg);
-            color: var(--neutral);
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(45, 91, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .search-input::placeholder {
-            color: var(--neutral-medium);
-            font-weight: 400;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1.25rem;
-            color: var(--primary);
-            font-size: 1.125rem;
-        }
-
-        /* Categorías */
-        .categories {
-            padding: 1.25rem;
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            border-bottom: 1px solid var(--border);
-            background: var(--card-bg);
-        }
-
-        .categories::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            margin-right: 1.625rem;
-            text-decoration: none;
-            transition: transform 0.3s ease;
-        }
-
-        .category:hover {
-            transform: translateY(-3px);
-        }
-
-        .category-icon {
-            width: 4.25rem;
-            height: 4.25rem;
-            border-radius: 1.125rem;
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.625rem;
-            margin-bottom: 0.75rem;
-            color: white;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .category:hover .category-icon {
-            transform: scale(1.08);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .category:nth-child(2n) .category-icon {
-            background: var(--gradient-secondary);
-        }
-
-        .category:nth-child(3n) .category-icon {
-            background: var(--gradient-accent);
-        }
-
-        .category:nth-child(4n) .category-icon {
-            background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
-        }
-
-        .category:nth-child(5n) .category-icon {
-            background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
-        }
-
-        .category-name {
-            font-size: 0.8125rem;
-            color: var(--neutral);
-            font-weight: 600;
-            text-align: center;
-            max-width: 5rem;
-        }
-
-        /* Contenido principal */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 5rem;
-            background: var(--neutral-light);
-        }
-
-        /* Títulos de sección */
-        .section-title {
-            padding: 1.375rem 1.5rem 0.75rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--neutral-dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--neutral-light);
-        }
-
-        .view-all {
-            color: var(--primary);
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .view-all:hover {
-            background: rgba(45, 91, 255, 0.1);
-        }
-
-        /* Restaurantes */
-        .restaurants {
-            padding: 0 1.375rem 1.375rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .restaurant-card {
-            background-color: var(--card-bg);
-            border-radius: 1.125rem;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-        }
-
-        .restaurant-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .restaurant-card:active {
-            transform: translateY(-1px);
-        }
-
-        .restaurant-image {
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(135deg, #2D5BFF 0%, #5A7AFF 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .restaurant-image::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 40%;
-            background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
-        }
-
-        .restaurant-info {
-            padding: 1.25rem;
-        }
-
-        .restaurant-name {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--neutral-dark);
-        }
-
-        .restaurant-category {
-            color: var(--neutral-medium);
-            font-size: 0.875rem;
-            margin-bottom: 0.75rem;
-            font-weight: 500;
-        }
-
-        .restaurant-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--neutral-medium);
-            font-size: 0.875rem;
-        }
-
-        .rating {
-            color: var(--primary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .rating i {
-            font-size: 0.875rem;
-        }
-
-        /* Navegación inferior */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background-color: var(--card-bg);
-            padding: 1rem 0;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
-            border-top: 1px solid var(--border);
-            z-index: 1000;
-        }
-
-        .nav-item {
-            text-align: center;
-            color: var(--neutral-medium);
-            font-size: 0.75rem;
-            flex: 1;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 0.5rem 0;
-            border-radius: 0.75rem;
-            margin: 0 0.3125rem;
-        }
-
-        .nav-item:hover {
-            color: var(--primary);
-            background: rgba(45, 91, 255, 0.05);
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-            font-weight: 600;
-            transform: translateY(-2px);
-        }
-
-        .nav-item.active .nav-icon {
-            transform: scale(1.1);
-            color: var(--primary);
-        }
-
-        .nav-icon {
-            font-size: 1.375rem;
-            margin-bottom: 0.375rem;
-            transition: all 0.3s ease;
-            display: block;
-        }
-
-        .cart-badge {
-            position: absolute;
-            top: -2px;
-            right: 1.25rem;
-            background: var(--gradient-accent);
-            color: white;
-            border-radius: 50%;
-            width: 1.25rem;
-            height: 1.25rem;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            border: 2px solid var(--card-bg);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Botones */
-        .add-to-cart, .checkout-btn, .back-to-home {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            border-radius: 0.875rem;
-            padding: 0.875rem 1.625rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-            font-size: 0.9375rem;
-            letter-spacing: 0.3px;
-        }
-
-        .add-to-cart {
-            padding: 0.75rem 1.375rem;
-            font-size: 0.875rem;
-            border-radius: 0.75rem;
-        }
-
-        .add-to-cart:hover, .checkout-btn:hover, .back-to-home:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .add-to-cart:active, .checkout-btn:active, .back-to-home:active {
-            transform: translateY(0);
-        }
-
-        /* Efectos de carga y animaciones */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .restaurant-card, .product-card {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        /* Responsive para tablets y desktop */
-        @media (min-width: 768px) {
-            .app-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .restaurants {
-                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            }
-
-            .categories {
-                display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 1.5rem;
-            }
-
-            .category {
-                margin-right: 0;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .content {
-                padding: 0 2rem 2rem;
-            }
-
-            header {
-                padding: 1.25rem 2rem;
-            }
-
-            .search-bar {
-                padding: 1.5rem 2rem;
-            }
-
-            .categories {
-                padding: 1.5rem 2rem;
-            }
-
-            .restaurants {
-                padding: 0 2rem 2rem;
-                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            }
-        }
-
-        /* Para móviles pequeños */
-        @media (max-width: 480px) {
-            .restaurants {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                padding: 0 1rem 1rem;
-            }
-
-            .section-title {
-                padding: 1rem 1rem 0.5rem;
-            }
-        }
-
-        /* Ocultar barra de estado en desktop */
-        @media (min-width: 768px) {
-            .status-bar {
-                display: none;
-            }
-        }
-
-        /* Mostrar barra de estado solo en móviles */
-        @media (max-width: 767px) {
-            .status-bar {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.5rem 1rem;
-                height: 2.5rem;
-                background: var(--neutral-dark);
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: white;
-            }
-
-            .status-bar .icons {
-                display: flex;
-                gap: 0.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icon-192.png" type="image/png">
 </head>
 <body>
     <div class="app-container">
-        <!-- Barra de estado (solo visible en móviles) -->
-        <div class="status-bar">
-            <div class="time" id="current-time">14:25</div>
-            <div class="icons">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-three-quarters"></i>
-            </div>
-        </div>
-        
         <!-- Vista de Inicio -->
         <div id="home-view" class="view active">
-            <header>
-                <div class="logo">
+            <header class="app-header">
+                <div class="app-logo">
                     <i class="fas fa-utensils"></i>
                     <span>Pa Llevar</span>
                 </div>
@@ -641,8 +67,175 @@
             </div>
         </div>
         
-        <!-- Otras vistas (products-view, cart-view, confirmation-view, etc.) -->
-        <!-- Se mantienen igual que en tu código anterior, pero sin el phone-mockup -->
+        <!-- Vista de Productos -->
+        <div id="products-view" class="view">
+            <header class="app-header">
+                <div class="app-logo">
+                    <i class="fas fa-arrow-left" id="back-button"></i>
+                    <span id="restaurant-name">Restaurante</span>
+                </div>
+                <div class="header-icons">
+                    <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="product-list" id="product-list">
+                    <!-- Los productos se cargarán dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista del Carrito -->
+        <div id="cart-view" class="view">
+            <header class="app-header">
+                <div class="app-logo">
+                    <i class="fas fa-arrow-left" id="back-from-cart"></i>
+                    <span>Mi Carrito</span>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="cart-items" id="cart-items">
+                    <!-- Los elementos del carrito se cargarán dinámicamente con JavaScript -->
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Envío</span>
+                        <span id="shipping">$2.50</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Impuestos</span>
+                        <span id="tax">$0.00</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>Total</span>
+                        <span id="total">$0.00</span>
+                    </div>
+                    
+                    <button class="btn checkout-btn" id="checkout-btn">Realizar Pedido</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista de Confirmación -->
+        <div id="confirmation-view" class="view">
+            <div class="content confirmation-view">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="confirmation-title">¡Pedido Confirmado!</h2>
+                <p class="confirmation-text">Tu pedido ha sido procesado y está siendo preparado. Te llegará en aproximadamente 30-40 minutos.</p>
+                <p class="confirmation-text">Número de pedido: #<span id="order-number">12345</span></p>
+                
+                <button class="btn back-to-home" id="back-to-home">Volver al Inicio</button>
+            </div>
+        </div>
+        
+        <!-- Vista de Búsqueda -->
+        <div id="search-view" class="view">
+            <header class="app-header">
+                <div class="app-logo">
+                    <i class="fas fa-arrow-left" id="back-from-search"></i>
+                    <span>Buscar</span>
+                </div>
+            </header>
+            
+            <div class="search-bar">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Buscar restaurantes o platos..." id="search-input">
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="search-results" id="search-results">
+                    <!-- Los resultados de búsqueda se cargarán dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista de Pedidos -->
+        <div id="orders-view" class="view">
+            <header class="app-header">
+                <div class="app-logo">
+                    <i class="fas fa-arrow-left" id="back-from-orders"></i>
+                    <span>Mis Pedidos</span>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="orders-list" id="orders-list">
+                    <!-- Los pedidos se cargarán dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista de Perfil -->
+        <div id="profile-view" class="view">
+            <header class="app-header">
+                <div class="app-logo">
+                    <i class="fas fa-arrow-left" id="back-from-profile"></i>
+                    <span>Mi Perfil</span>
+                </div>
+            </header>
+            
+            <div class="content profile-view">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="user-name">Usuario</h2>
+                        <p id="user-email">usuario@ejemplo.com</p>
+                    </div>
+                </div>
+                
+                <ul class="profile-menu">
+                    <li class="profile-menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>Direcciones</div>
+                    </li>
+                    <li class="profile-menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div>Métodos de Pago</div>
+                    </li>
+                    <li class="profile-menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div>Promociones</div>
+                    </li>
+                    <li class="profile-menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div>Configuración</div>
+                    </li>
+                    <li class="profile-menu-item">
+                        <div class="menu-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div>Ayuda</div>
+                    </li>
+                    <li class="profile-menu-item" id="logout-btn">
+                        <div class="menu-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div>Cerrar Sesión</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
         
         <!-- Navegación inferior -->
         <div class="bottom-nav">
@@ -671,656 +264,7 @@
         </div>
     </div>
 
-    <script>
-        // Datos de ejemplo para la aplicación
-        const restaurants = [
-            {
-                id: 1,
-                name: "La Pizza Nostra",
-                category: "Italiana • Pizza • Pasta",
-                rating: 4.8,
-                reviews: 500,
-                deliveryTime: "25-35 min",
-                image: "pizza",
-                tags: ["pizza", "pasta", "italiana"],
-                products: [
-                    { id: 101, name: "Pizza Margherita", description: "Salsa de tomate, mozzarella y albahaca", price: 9.99, icon: "fas fa-pizza-slice" },
-                    { id: 102, name: "Pizza Pepperoni", description: "Salsa de tomate, mozzarella y pepperoni", price: 11.99, icon: "fas fa-pizza-slice" },
-                    { id: 103, name: "Lasagna", description: "Carne, queso y pasta en capas", price: 12.99, icon: "fas fa-utensils" },
-                    { id: 104, name: "Spaghetti Carbonara", description: "Pasta con salsa cremosa de huevo y pancetta", price: 10.99, icon: "fas fa-utensils" }
-                ]
-            },
-            {
-                id: 2,
-                name: "Burger Paradise",
-                category: "Americana • Hamburguesas",
-                rating: 4.5,
-                reviews: 350,
-                deliveryTime: "20-30 min",
-                image: "hamburguesa",
-                tags: ["hamburguesa", "americana", "comida rápida"],
-                products: [
-                    { id: 201, name: "Burger Clásica", description: "Carne, lechuga, tomate y queso", price: 8.99, icon: "fas fa-hamburger" },
-                    { id: 202, name: "Burger BBQ", description: "Carne, bacon, cebolla crispy y salsa BBQ", price: 10.99, icon: "fas fa-hamburger" },
-                    { id: 203, name: "Burger Veggie", description: "Hamburguesa vegetariana con aguacate", price: 9.99, icon: "fas fa-leaf" },
-                    { id: 204, name: "Papas Fritas", description: "Porción grande con salsa", price: 3.99, icon: "fas fa-drumstick-bite" }
-                ]
-            },
-            {
-                id: 3,
-                name: "Sushi Express",
-                category: "Japonesa • Sushi • Poke",
-                rating: 4.6,
-                reviews: 420,
-                deliveryTime: "30-40 min",
-                image: "sushi",
-                tags: ["sushi", "japonesa", "poke", "asia"],
-                products: [
-                    { id: 301, name: "Roll California", description: "Cangrejo, aguacate y pepino", price: 12.99, icon: "fas fa-fish" },
-                    { id: 302, name: "Roll Philadelphia", description: "Salmón, queso crema y aguacate", price: 13.99, icon: "fas fa-fish" },
-                    { id: 303, name: "Sashimi Mixto", description: "Variedad de pescado crudo", price: 15.99, icon: "fas fa-fish" },
-                    { id: 304, name: "Bowl Poke", description: "Arroz, salmón, aguacate y vegetales", price: 11.99, icon: "fas fa-bowl-food" }
-                ]
-            },
-            {
-                id: 4,
-                name: "Café Central",
-                category: "Café • Postres • Breakfast",
-                rating: 4.7,
-                reviews: 280,
-                deliveryTime: "15-25 min",
-                image: "cafe",
-                tags: ["café", "postres", "desayuno", "té"],
-                products: [
-                    { id: 401, name: "Cappuccino", description: "Café espresso con leche vaporizada", price: 3.99, icon: "fas fa-coffee" },
-                    { id: 402, name: "Croissant", description: "Crujiente croissant de mantequilla", price: 2.99, icon: "fas fa-bread-slice" },
-                    { id: 403, name: "Tarta de Manzana", description: "Tarta dulce con manzanas caramelizadas", price: 4.99, icon: "fas fa-pie" },
-                    { id: 404, name: "Té Chai", description: "Té especiado con leche", price: 3.49, icon: "fas fa-mug-hot" }
-                ]
-            },
-            {
-                id: 5,
-                name: "Dulce Tentación",
-                category: "Postres • Helados • Repostería",
-                rating: 4.9,
-                reviews: 190,
-                deliveryTime: "20-30 min",
-                image: "postres",
-                tags: ["postres", "helados", "repostería", "dulce"],
-                products: [
-                    { id: 501, name: "Helado de Vainilla", description: "Helado cremoso de vainilla", price: 4.99, icon: "fas fa-ice-cream" },
-                    { id: 502, name: "Brownie de Chocolate", description: "Brownie esponjoso con nueces", price: 5.99, icon: "fas fa-cookie" },
-                    { id: 503, name: "Cheesecake", description: "Tarta de queso con base de galleta", price: 6.99, icon: "fas fa-cheese" },
-                    { id: 504, name: "Cupcakes", description: "Deliciosos cupcakes decorados", price: 3.99, icon: "fas fa-birthday-cake" }
-                ]
-            }
-        ];
-
-        // Estado de la aplicación
-        let cart = JSON.parse(localStorage.getItem('paLlevarCart')) || [];
-        let orders = JSON.parse(localStorage.getItem('paLlevarOrders')) || [];
-        let currentRestaurant = null;
-        let currentUser = JSON.parse(localStorage.getItem('paLlevarCurrentUser')) || null;
-        let userAddresses = JSON.parse(localStorage.getItem('paLlevarUserAddresses')) || [];
-        let currentOrderTracking = null;
-
-        // Elementos DOM
-        const views = document.querySelectorAll('.view');
-        const navItems = document.querySelectorAll('.nav-item');
-        const cartCount = document.getElementById('cart-count');
-        const cartItems = document.getElementById('cart-items');
-        const productList = document.getElementById('product-list');
-        const restaurantName = document.getElementById('restaurant-name');
-        const restaurantsList = document.getElementById('restaurants-list');
-        const subtotalEl = document.getElementById('subtotal');
-        const shippingEl = document.getElementById('shipping');
-        const taxEl = document.getElementById('tax');
-        const totalEl = document.getElementById('total');
-        const checkoutBtn = document.getElementById('checkout-btn');
-        const backButton = document.getElementById('back-button');
-        const backFromCart = document.getElementById('back-from-cart');
-        const backToHome = document.getElementById('back-to-home');
-        const backFromSearch = document.getElementById('back-from-search');
-        const backFromOrders = document.getElementById('back-from-orders');
-        const backFromProfile = document.getElementById('back-from-profile');
-        const orderNumber = document.getElementById('order-number');
-        const currentTime = document.getElementById('current-time');
-        const homeSearch = document.getElementById('home-search');
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results');
-        const ordersList = document.getElementById('orders-list');
-        const viewAllRestaurants = document.getElementById('view-all-restaurants');
-        const userName = document.getElementById('user-name');
-        const userEmail = document.getElementById('user-email');
-        const logoutBtn = document.getElementById('logout-btn');
-        const categories = document.querySelectorAll('.category');
-
-        // Funciones de navegación
-        function showView(viewId) {
-            views.forEach(view => view.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            
-            navItems.forEach(item => {
-                if (item.getAttribute('data-view') === viewId) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-            
-            // Acciones específicas para cada vista
-            if (viewId === 'cart-view') {
-                updateCartView();
-            } else if (viewId === 'orders-view') {
-                loadOrders();
-            } else if (viewId === 'profile-view') {
-                loadProfile();
-            } else if (viewId === 'home-view') {
-                renderRestaurants(restaurants);
-            }
-        }
-
-        // Inicializar la aplicación
-        function initApp() {
-            // Navegación inferior
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const viewId = item.getAttribute('data-view');
-                    showView(viewId);
-                });
-            });
-            
-            // Botones de retroceso
-            backButton.addEventListener('click', () => showView('home-view'));
-            backFromCart.addEventListener('click', () => {
-                if (currentRestaurant) {
-                    showView('products-view');
-                } else {
-                    showView('home-view');
-                }
-            });
-            backFromSearch.addEventListener('click', () => showView('home-view'));
-            backFromOrders.addEventListener('click', () => showView('home-view'));
-            backFromProfile.addEventListener('click', () => showView('home-view'));
-            
-            // Botón de volver al inicio
-            backToHome.addEventListener('click', () => {
-                showView('home-view');
-            });
-            
-            // Botón de checkout
-            checkoutBtn.addEventListener('click', checkout);
-            
-            // Búsqueda
-            homeSearch.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase();
-                if (query.length > 2) {
-                    showView('search-view');
-                    searchInput.value = query;
-                    performSearch(query);
-                }
-            });
-            
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase();
-                performSearch(query);
-            });
-            
-            // Ver todos los restaurantes
-            viewAllRestaurants.addEventListener('click', () => {
-                showView('search-view');
-                searchInput.value = '';
-                performSearch('');
-            });
-            
-            // Categorías
-            categories.forEach(category => {
-                category.addEventListener('click', () => {
-                    const categoryName = category.getAttribute('data-category');
-                    showView('search-view');
-                    searchInput.value = categoryName;
-                    performSearch(categoryName);
-                });
-            });
-            
-            // Cerrar sesión
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    alert('Función de cerrar sesión implementada');
-                });
-            }
-            
-            // Actualizar la hora
-            updateTime();
-            setInterval(updateTime, 60000);
-            
-            // Inicializar vistas
-            renderRestaurants(restaurants);
-            updateCartCount();
-        }
-
-        // Renderizar restaurantes
-        function renderRestaurants(restaurantsToRender) {
-            restaurantsList.innerHTML = '';
-            
-            restaurantsToRender.forEach(restaurant => {
-                const restaurantElement = document.createElement('div');
-                restaurantElement.className = 'restaurant-card';
-                restaurantElement.setAttribute('data-id', restaurant.id);
-                restaurantElement.innerHTML = `
-                    <div class="restaurant-image">
-                        <i class="fas fa-${restaurant.image}"></i>
-                    </div>
-                    <div class="restaurant-info">
-                        <div class="restaurant-name">${restaurant.name}</div>
-                        <div class="restaurant-category">${restaurant.category}</div>
-                        <div class="restaurant-meta">
-                            <span class="rating"><i class="fas fa-star"></i> ${restaurant.rating} (${restaurant.reviews}+)</span>
-                            <span>${restaurant.deliveryTime}</span>
-                        </div>
-                    </div>
-                `;
-                
-                restaurantElement.addEventListener('click', () => {
-                    openRestaurant(restaurant.id);
-                });
-                
-                restaurantsList.appendChild(restaurantElement);
-            });
-        }
-
-        // Abrir un restaurante y mostrar sus productos
-        function openRestaurant(restaurantId) {
-            const restaurant = restaurants.find(r => r.id === restaurantId);
-            if (restaurant) {
-                currentRestaurant = restaurant;
-                restaurantName.textContent = restaurant.name;
-                renderProducts(restaurant.products);
-                showView('products-view');
-            }
-        }
-
-        // Renderizar productos
-        function renderProducts(products) {
-            productList.innerHTML = '';
-            
-            products.forEach(product => {
-                const productElement = document.createElement('div');
-                productElement.className = 'product-card';
-                productElement.innerHTML = `
-                    <div class="product-image">
-                        <i class="${product.icon}"></i>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-desc">${product.description}</div>
-                        <div class="product-meta">
-                            <div class="product-price">$${product.price.toFixed(2)}</div>
-                            <button class="add-to-cart" data-id="${product.id}">Añadir</button>
-                        </div>
-                    </div>
-                `;
-                
-                productElement.querySelector('.add-to-cart').addEventListener('click', (e) => {
-                    const productId = parseInt(e.target.getAttribute('data-id'));
-                    addToCart(productId);
-                    e.stopPropagation();
-                });
-                
-                productList.appendChild(productElement);
-            });
-        }
-
-        // Añadir producto al carrito
-        function addToCart(productId) {
-            // Buscar el producto en todos los restaurantes
-            let product = null;
-            for (const restaurant of restaurants) {
-                product = restaurant.products.find(p => p.id === productId);
-                if (product) break;
-            }
-            
-            if (product) {
-                // Verificar si el producto ya está en el carrito
-                const existingItem = cart.find(item => item.id === productId);
-                
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    cart.push({
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        quantity: 1,
-                        icon: product.icon,
-                        restaurant: currentRestaurant.name
-                    });
-                }
-                
-                updateCartCount();
-                saveCart();
-                
-                // Mostrar feedback visual
-                const button = document.querySelector(`.add-to-cart[data-id="${productId}"]`);
-                const originalText = button.textContent;
-                button.textContent = "✓ Añadido";
-                button.style.backgroundColor = '#4caf50';
-                
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.backgroundColor = '';
-                }, 1500);
-            }
-        }
-
-        // Actualizar contador del carrito
-        function updateCartCount() {
-            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = totalItems;
-        }
-
-        // Guardar carrito en localStorage
-        function saveCart() {
-            localStorage.setItem('paLlevarCart', JSON.stringify(cart));
-        }
-
-        // Actualizar vista del carrito
-        function updateCartView() {
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<p style="text-align: center; padding: 20px; color: #777;">Tu carrito está vacío</p>';
-                checkoutBtn.disabled = true;
-                checkoutBtn.style.opacity = '0.5';
-            } else {
-                checkoutBtn.disabled = false;
-                checkoutBtn.style.opacity = '1';
-                
-                cart.forEach(item => {
-                    const cartItemElement = document.createElement('div');
-                    cartItemElement.className = 'cart-item';
-                    cartItemElement.innerHTML = `
-                        <div class="cart-item-image">
-                            <i class="${item.icon}"></i>
-                        </div>
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
-                            <div style="font-size: 12px; color: #777;">${item.restaurant}</div>
-                        </div>
-                        <div class="cart-item-controls">
-                            <button class="quantity-btn minus" data-id="${item.id}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-btn plus" data-id="${item.id}">+</button>
-                        </div>
-                    `;
-                    
-                    cartItemElement.querySelector('.plus').addEventListener('click', () => {
-                        const item = cart.find(i => i.id === item.id);
-                        if (item) {
-                            item.quantity += 1;
-                            updateCartView();
-                            updateCartCount();
-                            saveCart();
-                        }
-                    });
-                    
-                    cartItemElement.querySelector('.minus').addEventListener('click', () => {
-                        const itemIndex = cart.findIndex(i => i.id === item.id);
-                        if (itemIndex !== -1) {
-                            cart[itemIndex].quantity -= 1;
-                            if (cart[itemIndex].quantity <= 0) {
-                                cart.splice(itemIndex, 1);
-                            }
-                            updateCartView();
-                            updateCartCount();
-                            saveCart();
-                        }
-                    });
-                    
-                    cartItems.appendChild(cartItemElement);
-                });
-            }
-            
-            // Actualizar totales
-            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            const tax = subtotal * 0.1; // 10% de impuestos
-            const shipping = subtotal > 0 ? 2.5 : 0;
-            const total = subtotal + tax + shipping;
-            
-            subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-            taxEl.textContent = `$${tax.toFixed(2)}`;
-            shippingEl.textContent = shipping > 0 ? `$${shipping.toFixed(2)}` : 'Gratis';
-            totalEl.textContent = `$${total.toFixed(2)}`;
-        }
-
-        // Realizar checkout
-        function checkout() {
-            if (cart.length === 0) {
-                alert('El carrito está vacío');
-                return;
-            }
-            
-            // Crear pedido
-            const order = {
-                id: Date.now(),
-                date: new Date().toLocaleDateString(),
-                items: [...cart],
-                subtotal: cart.reduce((total, item) => total + (item.price * item.quantity), 0),
-                tax: cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 0.1,
-                shipping: 2.5,
-                total: cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 1.1 + 2.5,
-                status: 'Preparando'
-            };
-            
-            // Guardar pedido
-            orders.unshift(order);
-            localStorage.setItem('paLlevarOrders', JSON.stringify(orders));
-            
-            // Vaciar carrito
-            cart = [];
-            saveCart();
-            updateCartCount();
-            
-            // Mostrar confirmación
-            orderNumber.textContent = order.id;
-            showView('confirmation-view');
-        }
-
-        // Realizar búsqueda
-        function performSearch(query) {
-            searchResults.innerHTML = '';
-            
-            if (query === '') {
-                // Mostrar todos los restaurantes si no hay query
-                restaurants.forEach(restaurant => {
-                    const restaurantElement = document.createElement('div');
-                    restaurantElement.className = 'restaurant-card';
-                    restaurantElement.setAttribute('data-id', restaurant.id);
-                    restaurantElement.innerHTML = `
-                        <div class="restaurant-image">
-                            <i class="fas fa-${restaurant.image}"></i>
-                        </div>
-                        <div class="restaurant-info">
-                            <div class="restaurant-name">${restaurant.name}</div>
-                            <div class="restaurant-category">${restaurant.category}</div>
-                            <div class="restaurant-meta">
-                                <span class="rating"><i class="fas fa-star"></i> ${restaurant.rating} (${restaurant.reviews}+)</span>
-                                <span>${restaurant.deliveryTime}</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    restaurantElement.addEventListener('click', () => {
-                        openRestaurant(restaurant.id);
-                    });
-                    
-                    searchResults.appendChild(restaurantElement);
-                });
-                return;
-            }
-            
-            // Buscar restaurantes
-            const restaurantResults = restaurants.filter(restaurant => 
-                restaurant.name.toLowerCase().includes(query) || 
-                restaurant.category.toLowerCase().includes(query) ||
-                restaurant.tags.some(tag => tag.includes(query))
-            );
-            
-            // Buscar productos
-            const productResults = [];
-            restaurants.forEach(restaurant => {
-                restaurant.products.forEach(product => {
-                    if (product.name.toLowerCase().includes(query) || 
-                        product.description.toLowerCase().includes(query)) {
-                        productResults.push({
-                            ...product,
-                            restaurant: restaurant.name,
-                            restaurantId: restaurant.id
-                        });
-                    }
-                });
-            });
-            
-            // Mostrar resultados
-            if (restaurantResults.length === 0 && productResults.length === 0) {
-                searchResults.innerHTML = `
-                    <div class="no-results">
-                        <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px;"></i>
-                        <p>No se encontraron resultados para "${query}"</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Mostrar restaurantes encontrados
-            if (restaurantResults.length > 0) {
-                const title = document.createElement('div');
-                title.className = 'section-title';
-                title.innerHTML = '<span>Restaurantes</span>';
-                searchResults.appendChild(title);
-                
-                restaurantResults.forEach(restaurant => {
-                    const restaurantElement = document.createElement('div');
-                    restaurantElement.className = 'restaurant-card';
-                    restaurantElement.setAttribute('data-id', restaurant.id);
-                    restaurantElement.innerHTML = `
-                        <div class="restaurant-image">
-                            <i class="fas fa-${restaurant.image}"></i>
-                        </div>
-                        <div class="restaurant-info">
-                            <div class="restaurant-name">${restaurant.name}</div>
-                            <div class="restaurant-category">${restaurant.category}</div>
-                            <div class="restaurant-meta">
-                                <span class="rating"><i class="fas fa-star"></i> ${restaurant.rating} (${restaurant.reviews}+)</span>
-                                <span>${restaurant.deliveryTime}</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    restaurantElement.addEventListener('click', () => {
-                        openRestaurant(restaurant.id);
-                    });
-                    
-                    searchResults.appendChild(restaurantElement);
-                });
-            }
-            
-            // Mostrar productos encontrados
-            if (productResults.length > 0) {
-                const title = document.createElement('div');
-                title.className = 'section-title';
-                title.innerHTML = '<span>Productos</span>';
-                searchResults.appendChild(title);
-                
-                productResults.forEach(product => {
-                    const productElement = document.createElement('div');
-                    productElement.className = 'product-card';
-                    productElement.innerHTML = `
-                        <div class="product-image">
-                            <i class="${product.icon}"></i>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-name">${product.name}</div>
-                            <div class="product-desc">${product.description}</div>
-                            <div style="font-size: 12px; color: #777;">${product.restaurant}</div>
-                            <div class="product-meta">
-                                <div class="product-price">$${product.price.toFixed(2)}</div>
-                                <button class="add-to-cart" data-id="${product.id}" data-restaurant="${product.restaurantId}">Añadir</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    productElement.querySelector('.add-to-cart').addEventListener('click', (e) => {
-                        const productId = parseInt(e.target.getAttribute('data-id'));
-                        const restaurantId = parseInt(e.target.getAttribute('data-restaurant'));
-                        
-                        // Abrir el restaurante primero
-                        const restaurant = restaurants.find(r => r.id === restaurantId);
-                        if (restaurant) {
-                            currentRestaurant = restaurant;
-                            addToCart(productId);
-                        }
-                        
-                        e.stopPropagation();
-                    });
-                    
-                    searchResults.appendChild(productElement);
-                });
-            }
-        }
-
-        // Cargar pedidos
-        function loadOrders() {
-            ordersList.innerHTML = '';
-            
-            if (orders.length === 0) {
-                ordersList.innerHTML = `
-                    <div class="no-results">
-                        <i class="fas fa-shopping-bag" style="font-size: 40px; margin-bottom: 15px;"></i>
-                        <p>No tienes pedidos realizados</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            orders.forEach(order => {
-                const orderElement = document.createElement('div');
-                orderElement.className = 'order-card';
-                orderElement.innerHTML = `
-                    <div class="order-header">
-                        <div class="order-number">Pedido #${order.id}</div>
-                        <div class="order-date">${order.date}</div>
-                    </div>
-                    <div>${order.items.length} productos</div>
-                    <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
-                    <div style="margin-top: 10px; font-weight: 600;">Total: $${order.total.toFixed(2)}</div>
-                `;
-                
-                ordersList.appendChild(orderElement);
-            });
-        }
-
-        // Cargar perfil
-        function loadProfile() {
-            if (currentUser) {
-                userName.textContent = currentUser.name;
-                userEmail.textContent = currentUser.email;
-            }
-        }
-
-        // Actualizar la hora
-        function updateTime() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            if (currentTime) {
-                currentTime.textContent = `${hours}:${minutes}`;
-            }
-        }
-
-        // Inicializar la aplicación cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+    <script src="js/app.js"></script>
+    <script src="js/pwa.js"></script>
 </body>
 </html>
