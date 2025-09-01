@@ -271,7 +271,7 @@ async function handleRegister(e) {
             
             // Cambiar a vista principal
             showView('home-view');
-        } else {
+    } else {
             console.log('❌ Error en registro:', result.error);
             // Error en registro
             showError('register', result.error || 'Error al crear la cuenta');
@@ -389,16 +389,16 @@ function displaySearchResults(results, category = null) {
                 <div class="restaurant-overlay">
                     <span class="restaurant-category">${restaurant.category}</span>
                 </div>
-            </div>
-            <div class="restaurant-info">
-                <div class="restaurant-name">${restaurant.name}</div>
+                </div>
+                <div class="restaurant-info">
+                    <div class="restaurant-name">${restaurant.name}</div>
                 <div class="restaurant-category">${restaurant.description}</div>
-                <div class="restaurant-meta">
+                    <div class="restaurant-meta">
                     <span class="rating">⭐ ${restaurant.rating}</span>
                     <span>${restaurant.delivery_time} min</span>
                 </div>
-            </div>
-        </div>
+                    </div>
+                </div>
     `).join('');
     
     searchResultsContainer.innerHTML = resultsHTML;
@@ -432,15 +432,15 @@ function loadProducts(restaurantId) {
     const productsHTML = products.map(product => `
         <div class="product-card" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
             <div class="product-image" style="background-image: url('${product.image_url}')"></div>
-            <div class="product-info">
-                <div class="product-name">${product.name}</div>
-                <div class="product-desc">${product.description}</div>
-                <div class="product-meta">
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-desc">${product.description}</div>
+                    <div class="product-meta">
                     <span class="product-price">$${product.price.toFixed(2)}</span>
                     <button class="btn btn-sm">Agregar</button>
                 </div>
-            </div>
-        </div>
+                    </div>
+                </div>
     `).join('');
     
     productListContainer.innerHTML = productsHTML;
@@ -561,7 +561,7 @@ function addToCart(product) {
     
     if (existingItem) {
         existingItem.quantity += 1;
-    } else {
+        } else {
         AppState.cart.push({
             ...product,
             quantity: 1
@@ -589,9 +589,9 @@ function updateCartDisplay() {
                 <p>Tu carrito está vacío</p>
             </div>
         `;
-        return;
-    }
-    
+            return;
+        }
+
     const cartItemsHTML = AppState.cart.map(item => `
         <div class="cart-item">
             <div class="cart-item-image" style="background-image: url('${item.image_url}')"></div>
