@@ -743,6 +743,8 @@ body {
     gap: 1rem;
     cursor: pointer;
     transition: var(--transition);
+    color: #2D2D4D !important;
+    opacity: 1 !important;
 }
 
 .profile-menu-item:hover {

@@ -529,8 +529,11 @@ function loadOrders() {
 
 // ===== PERFIL =====
 function loadProfile() {
-    userName.textContent = "Usuario Ejemplo";
-    userEmail.textContent = "usuario@ejemplo.com";
+    const user = JSON.parse(localStorage.getItem('paLlevarCurrentUser'));
+    if (user) {
+        userName.textContent = user.name;
+        userEmail.textContent = user.email;
+    }
 }
 
 // ===== NOTIFICACIONES =====
@@ -551,7 +554,7 @@ window.addEventListener('offline', updateOnlineStatus);
 
 // Usuarios registrados (simulado en localStorage)
 function getUsers() {
-    return JSON.parse(localStorage.getItem('paLlevarUsers') || '[]');
+    return JSON.parse(localStorage.getItem('paLlevarUsers')) || [];
 }
 function saveUsers(users) {
     localStorage.setItem('paLlevarUsers', JSON.stringify(users));
@@ -613,49 +616,101 @@ function register() {
     }
 }
 
-// Cerrar sesión
-function logout() {
-    localStorage.removeItem('paLlevarUser');
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) logoutBtn.style.display = 'none';
+// Simulación de usuario
+const demoUser = {
+    email: "usuario@ejemplo.com",
+    password: "123456",
+    name: "Usuario Ejemplo"
+};
 
-    // Corrige los IDs según tu HTML
-    const homeSection = document.getElementById('home');
-    if (homeSection) homeSection.style.display = 'none';
+const loginBtn = document.getElementById('login-btn');
+const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
+const loginError = document.getElementById('login-error');
+const registerBtn = document.getElementById('register-btn');
+const registerName = document.getElementById('register-name');
+const registerEmail = document.getElementById('register-email');
+const registerPassword = document.getElementById('register-password');
+const registerError = document.getElementById('register-error');
 
-    const loginSection = document.getElementById('login');
-    if (loginSection) loginSection.style.display = 'block';
-
-    // Si usas vistas con clase "view" y "active"
+function showLogin() {
     document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-    const loginView = document.getElementById('login-view');
-    if (loginView) loginView.classList.add('active');
+    document.getElementById('login-view').classList.add('active');
 }
 
-// Listeners para registro y logout
-document.addEventListener('DOMContentLoaded', () => {
-    const registerBtn = document.getElementById('register-btn');
-    if (registerBtn) {
-        registerBtn.addEventListener('click', () => {
-            register();
-        });
-    }
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            logout();
-        });
-    }
+loginBtn?.addEventListener('click', async () => {
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value.trim();
 
-    // Mostrar login o home según sesión
-    const currentUser = localStorage.getItem('paLlevarUser');
-    if (currentUser) {
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('home').style.display = 'block';
-        document.getElementById('logout-btn').style.display = 'inline-block';
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        loginError.textContent = "Correo o contraseña incorrectos";
+        loginError.style.display = 'block';
     } else {
-        document.getElementById('login').style.display = 'block';
-        document.getElementById('home').style.display = 'none';
-        document.getElementById('logout-btn').style.display = 'none';
+        // Obtener nombre del usuario
+        const user = data.user;
+        localStorage.setItem('paLlevarCurrentUser', JSON.stringify({
+            name: user.user_metadata?.name || "",
+            email: user.email
+        }));
+        loginError.style.display = 'none';
+        showView('home-view');
+        loadProfile();
     }
 });
+
+registerBtn?.addEventListener('click', async () => {
+    const name = registerName.value.trim();
+    const email = registerEmail.value.trim();
+    const password = registerPassword.value.trim();
+
+    if (!name || !email || !password) {
+        registerError.textContent = "Completa todos los campos";
+        registerError.style.display = 'block';
+        return;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: { name }
+        }
+    });
+
+    if (error) {
+        registerError.textContent = error.message;
+        registerError.style.display = 'block';
+    } else {
+        localStorage.setItem('paLlevarCurrentUser', JSON.stringify({ name, email }));
+        registerError.style.display = 'none';
+        showView('home-view');
+        loadProfile();
+    }
+});
+
+// Mostrar login si no hay usuario
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = localStorage.getItem('paLlevarCurrentUser');
+    if (!user) showLogin();
+});
+
+// Cerrar sesión
+logoutBtn?.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem('paLlevarCurrentUser');
+    showLogin();
+});
+
+// Actualiza el perfil con datos del usuario actual
+function loadProfile() {
+    const user = JSON.parse(localStorage.getItem('paLlevarCurrentUser'));
+    if (user) {
+        userName.textContent = user.name;
+        userEmail.textContent = user.email;
+    }
+}
