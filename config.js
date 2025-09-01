@@ -6,9 +6,8 @@ const CONFIG = {
     APP_DESCRIPTION: 'App de pedidos de comida a domicilio',
     
     // Configuración de Supabase
-    SUPABASE_URL: 'https://jbtpwzpdkxrgqaedduai.supabase.co ', // Reemplaza con tu URL real
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpidHB3enBka3hyZ3FhZWRkdWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2OTM2MjIsImV4cCI6MjA3MjI2OTYyMn0._Kmq-AxZSntip4iO9FCQ1-7tKb_nRyot4HmnAsgFujw
-', // Reemplaza con tu anon key real
+    SUPABASE_URL: 'https://jbtpwzpdkxrgqaedduai.supabase.co', // Reemplaza con tu URL real
+    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpidHB3enBka3hyZ3FhZWRkdWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2OTM2MjIsImV4cCI6MjA3MjI2OTYyMn0._Kmq-AxZSntip4iO9FCQ1-7tKb_nRyot4HmnAsgFujw', // Reemplaza con tu anon key real
     
     // Configuración de la API
     API_BASE_URL: 'https://api.pallevar.com',

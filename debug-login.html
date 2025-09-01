@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Login - Pa Llevar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #F0F2F8;
+            font-family: 'Inter', sans-serif;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .debug-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .debug-button {
+            background: #2D5BFF;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .debug-button:hover {
+            background: #1A46E0;
+        }
+        .debug-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .login-form input {
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .login-form button {
+            background: #2D5BFF;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔧 Debug Login - Pa Llevar</h1>
+        
+        <div class="debug-section">
+            <h3>1. Verificar Configuración</h3>
+            <button class="debug-button" onclick="checkConfig()">Verificar Config</button>
+            <div id="config-result" class="debug-result info">Cargando...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>2. Verificar Supabase Client</h3>
+            <button class="debug-button" onclick="checkSupabaseClient()">Verificar Cliente</button>
+            <div id="client-result" class="debug-result info">Cargando...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>3. Test de Conexión Directa</h3>
+            <button class="debug-button" onclick="testDirectConnection()">Test Conexión</button>
+            <div id="connection-result" class="debug-result info">Cargando...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>4. Test de Autenticación</h3>
+            <form class="login-form" onsubmit="testAuth(event)">
+                <input type="email" id="test-email" placeholder="Email de prueba" value="test@example.com">
+                <input type="password" id="test-password" placeholder="Contraseña" value="123456">
+                <button type="submit">Probar Login</button>
+            </form>
+            <div id="auth-result" class="debug-result info">Cargando...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>5. Verificar Tablas</h3>
+            <button class="debug-button" onclick="checkTables()">Verificar Tablas</button>
+            <div id="tables-result" class="debug-result info">Cargando...</div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>6. Logs de Consola</h3>
+            <button class="debug-button" onclick="clearLogs()">Limpiar Logs</button>
+            <div id="console-logs" class="debug-result info">Los logs aparecerán aquí...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        let logs = [];
+        
+        // Función para agregar logs
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            updateLogDisplay();
+        }
+        
+        // Actualizar display de logs
+        function updateLogDisplay() {
+            const logDiv = document.getElementById('console-logs');
+            logDiv.textContent = logs.join('\n');
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // Limpiar logs
+        function clearLogs() {
+            logs = [];
+            updateLogDisplay();
+        }
+        
+        // Verificar configuración
+        function checkConfig() {
+            const resultDiv = document.getElementById('config-result');
+            addLog('Verificando configuración...');
+            
+            try {
+                if (typeof CONFIG === 'undefined') {
+                    resultDiv.className = 'debug-result error';
+                    resultDiv.textContent = '❌ CONFIG no está definido';
+                    addLog('ERROR: CONFIG no está definido', 'error');
+                    return;
+                }
+                
+                if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
+                    resultDiv.className = 'debug-result error';
+                    resultDiv.textContent = '❌ Credenciales de Supabase faltantes';
+                    addLog('ERROR: Credenciales de Supabase faltantes', 'error');
+                    return;
+                }
+                
+                resultDiv.className = 'debug-result success';
+                resultDiv.textContent = `✅ Configuración encontrada\nURL: ${CONFIG.SUPABASE_URL}\nAnon Key: ${CONFIG.SUPABASE_ANON_KEY.substring(0, 20)}...`;
+                addLog('Configuración verificada correctamente', 'success');
+                
+            } catch (error) {
+                resultDiv.className = 'debug-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Verificar cliente Supabase
+        function checkSupabaseClient() {
+            const resultDiv = document.getElementById('client-result');
+            addLog('Verificando cliente Supabase...');
+            
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    resultDiv.className = 'debug-result error';
+                    resultDiv.textContent = '❌ Supabase CDN no cargado';
+                    addLog('ERROR: Supabase CDN no cargado', 'error');
+                    return;
+                }
+                
+                if (typeof supabase === 'undefined') {
+                    resultDiv.className = 'debug-result error';
+                    resultDiv.textContent = '❌ Cliente Supabase no inicializado';
+                    addLog('ERROR: Cliente Supabase no inicializado', 'error');
+                    return;
+                }
+                
+                resultDiv.className = 'debug-result success';
+                resultDiv.textContent = '✅ Cliente Supabase inicializado correctamente';
+                addLog('Cliente Supabase verificado', 'success');
+                
+            } catch (error) {
+                resultDiv.className = 'debug-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de conexión directa
+        async function testDirectConnection() {
+            const resultDiv = document.getElementById('connection-result');
+            resultDiv.className = 'debug-result info';
+            resultDiv.textContent = '🔄 Probando conexión...';
+            addLog('Probando conexión directa...');
+            
+            try {
+                // Test simple de conexión
+                const { data, error } = await supabase.from('restaurants').select('count').limit(1);
+                
+                if (error) {
+                    resultDiv.className = 'debug-result error';
+                    resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                    addLog(`ERROR de conexión: ${error.message}`, 'error');
+                } else {
+                    resultDiv.className = 'debug-result success';
+                    resultDiv.textContent = '✅ Conexión exitosa con Supabase';
+                    addLog('Conexión exitosa', 'success');
+                }
+            } catch (error) {
+                resultDiv.className = 'debug-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de autenticación
+        async function testAuth(e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById('auth-result');
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            
+            resultDiv.className = 'debug-result info';
+            resultDiv.textContent = '🔄 Probando autenticación...';
+            addLog(`Probando login con: ${email}`);
+            
+            try {
+                // Test de login
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    resultDiv.className = 'debug-result error';
+                    resultDiv.textContent = `❌ Error de autenticación: ${error.message}`;
+                    addLog(`ERROR de autenticación: ${error.message}`, 'error');
+                } else {
+                    resultDiv.className = 'debug-result success';
+                    resultDiv.textContent = `✅ Login exitoso\nUsuario: ${data.user.email}\nID: ${data.user.id}`;
+                    addLog(`Login exitoso: ${data.user.email}`, 'success');
+                }
+            } catch (error) {
+                resultDiv.className = 'debug-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Verificar tablas
+        async function checkTables() {
+            const resultDiv = document.getElementById('tables-result');
+            resultDiv.className = 'debug-result info';
+            resultDiv.textContent = '🔄 Verificando tablas...';
+            addLog('Verificando tablas...');
+            
+            try {
+                const tables = ['restaurants', 'products', 'orders', 'profiles'];
+                const results = {};
+                
+                for (const table of tables) {
+                    try {
+                        const { data, error } = await supabase.from(table).select('count').limit(1);
+                        results[table] = error ? `Error: ${error.message}` : `OK (${data.length} registros)`;
+                    } catch (err) {
+                        results[table] = `Error: ${err.message}`;
+                    }
+                }
+                
+                resultDiv.className = 'debug-result success';
+                resultDiv.textContent = 'Resultados de verificación de tablas:\n' + 
+                    Object.entries(results).map(([table, result]) => `${table}: ${result}`).join('\n');
+                addLog('Verificación de tablas completada', 'success');
+                
+            } catch (error) {
+                resultDiv.className = 'debug-result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                addLog(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        // Inicializar debug
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('Debug iniciado');
+            checkConfig();
+            checkSupabaseClient();
+        });
+        
+        // Capturar errores globales
+        window.addEventListener('error', (event) => {
+            addLog(`ERROR GLOBAL: ${event.error.message}`, 'error');
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            addLog(`PROMISE REJECTED: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>
