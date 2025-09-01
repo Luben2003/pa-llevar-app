@@ -4,284 +4,304 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pa Llevar - App de Comida</title>
-    <meta name="description" content="App de pedidos de comida a domicilio">
+    <meta name="description" content="App de pedidos de comida a domicilio. Encuentra los mejores restaurantes y ordena tu comida favorita para llevar.">
+    <meta name="keywords" content="comida, delivery, restaurantes, pedidos, pizza, hamburguesas, sushi">
+    <meta name="author" content="Pa Llevar">
     <meta name="theme-color" content="#2D5BFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Pa Llevar">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container" role="application" aria-label="Pa Llevar - App de Comida">
         <!-- Vista de Inicio -->
-        <div id="home-view" class="view active">
-            <header class="app-header">
+        <div id="home-view" class="view" role="main" aria-label="Página principal">
+            <header class="app-header" role="banner">
                 <div class="app-logo">
-                    <i class="fas fa-utensils"></i>
+                    <i class="fas fa-utensils" aria-hidden="true"></i>
                     <span>Pa Llevar</span>
                 </div>
-                <div class="header-icons">
-                    <button class="icon-btn"><i class="fas fa-map-marker-alt"></i></button>
-                    <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                <div class="header-icons" role="toolbar" aria-label="Acciones rápidas">
+                    <button class="icon-btn" aria-label="Ubicación"><i class="fas fa-map-marker-alt" aria-hidden="true"></i></button>
+                    <button class="icon-btn" aria-label="Notificaciones"><i class="fas fa-bell" aria-hidden="true"></i></button>
                 </div>
             </header>
             
-            <div class="search-bar">
+            <div class="search-bar" role="search">
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Buscar restaurantes o platos..." id="home-search">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text" class="search-input" placeholder="Buscar restaurantes o platos..." id="home-search" aria-label="Buscar restaurantes o platos">
                 </div>
             </div>
             
-            <div class="categories">
-                <div class="category" data-category="pizza">
-                    <div class="category-icon"><i class="fas fa-pizza-slice"></i></div>
+            <nav class="categories" role="navigation" aria-label="Categorías de comida">
+                <div class="category" data-category="pizza" role="button" tabindex="0" aria-label="Ver restaurantes de pizza">
+                    <div class="category-icon"><i class="fas fa-pizza-slice" aria-hidden="true"></i></div>
                     <div class="category-name">Pizza</div>
                 </div>
-                <div class="category" data-category="hamburguesa">
-                    <div class="category-icon"><i class="fas fa-hamburger"></i></div>
+                <div class="category" data-category="hamburguesa" role="button" tabindex="0" aria-label="Ver restaurantes de hamburguesas">
+                    <div class="category-icon"><i class="fas fa-hamburger" aria-hidden="true"></i></div>
                     <div class="category-name">Hamburguesas</div>
                 </div>
-                <div class="category" data-category="sushi">
-                    <div class="category-icon"><i class="fas fa-fish"></i></div>
+                <div class="category" data-category="sushi" role="button" tabindex="0" aria-label="Ver restaurantes de sushi">
+                    <div class="category-icon"><i class="fas fa-fish" aria-hidden="true"></i></div>
                     <div class="category-name">Sushi</div>
                 </div>
-                <div class="category" data-category="cafe">
-                    <div class="category-icon"><i class="fas fa-coffee"></i></div>
+                <div class="category" data-category="cafe" role="button" tabindex="0" aria-label="Ver cafeterías">
+                    <div class="category-icon"><i class="fas fa-coffee" aria-hidden="true"></i></div>
                     <div class="category-name">Café</div>
                 </div>
-                <div class="category" data-category="postres">
-                    <div class="category-icon"><i class="fas fa-ice-cream"></i></div>
+                <div class="category" data-category="postres" role="button" tabindex="0" aria-label="Ver restaurantes de postres">
+                    <div class="category-icon"><i class="fas fa-ice-cream" aria-hidden="true"></i></div>
                     <div class="category-name">Postres</div>
                 </div>
-            </div>
+            </nav>
             
-            <div class="content">
-                <div class="section-title">
-                    <span>Restaurantes populares</span>
-                    <span class="view-all" id="view-all-restaurants">Ver todos</span>
-                </div>
-                <div class="restaurants" id="restaurants-list">
-                    <!-- Los restaurantes se cargarán dinámicamente con JavaScript -->
-                </div>
-            </div>
+            <main class="content">
+                <section class="restaurants-section">
+                    <div class="section-title">
+                        <h2>Restaurantes populares</h2>
+                        <button class="view-all" id="view-all-restaurants" aria-label="Ver todos los restaurantes">Ver todos</button>
+                    </div>
+                    <div class="restaurants" id="restaurants-list" role="list" aria-label="Lista de restaurantes populares">
+                        <!-- Los restaurantes se cargarán dinámicamente con JavaScript -->
+                    </div>
+                </section>
+            </main>
         </div>
         
         <!-- Vista de Productos -->
-        <div id="products-view" class="view">
-            <header class="app-header">
+        <div id="products-view" class="view" role="main" aria-label="Productos del restaurante">
+            <header class="app-header" role="banner">
                 <div class="app-logo">
-                    <i class="fas fa-arrow-left" id="back-button"></i>
-                    <span id="restaurant-name">Restaurante</span>
+                    <button class="icon-btn" id="back-button" aria-label="Volver atrás"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+                    <h1 id="restaurant-name">Restaurante</h1>
                 </div>
                 <div class="header-icons">
-                    <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
+                    <button class="icon-btn" aria-label="Compartir restaurante"><i class="fas fa-share-alt" aria-hidden="true"></i></button>
                 </div>
             </header>
             
-            <div class="content">
-                <div class="product-list" id="product-list">
+            <main class="content">
+                <div class="product-list" id="product-list" role="list" aria-label="Lista de productos">
                     <!-- Los productos se cargarán dinámicamente con JavaScript -->
                 </div>
-            </div>
+            </main>
         </div>
         
         <!-- Vista del Carrito -->
-        <div id="cart-view" class="view">
-            <header class="app-header">
+        <div id="cart-view" class="view" role="main" aria-label="Mi carrito de compras">
+            <header class="app-header" role="banner">
                 <div class="app-logo">
-                    <i class="fas fa-arrow-left" id="back-from-cart"></i>
-                    <span>Mi Carrito</span>
+                    <button class="icon-btn" id="back-from-cart" aria-label="Volver atrás"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+                    <h1>Mi Carrito</h1>
                 </div>
             </header>
             
-            <div class="content">
-                <div class="cart-items" id="cart-items">
+            <main class="content">
+                <div class="cart-items" id="cart-items" role="list" aria-label="Elementos en el carrito">
                     <!-- Los elementos del carrito se cargarán dinámicamente con JavaScript -->
                 </div>
                 
-                <div class="cart-summary">
+                <section class="cart-summary" role="complementary" aria-label="Resumen del pedido">
                     <div class="summary-row">
                         <span>Subtotal</span>
-                        <span id="subtotal">$0.00</span>
+                        <span id="subtotal" aria-label="Subtotal del pedido">$0.00</span>
                     </div>
                     <div class="summary-row">
                         <span>Envío</span>
-                        <span id="shipping">$2.50</span>
+                        <span id="shipping" aria-label="Costo de envío">$2.50</span>
                     </div>
                     <div class="summary-row">
                         <span>Impuestos</span>
-                        <span id="tax">$0.00</span>
+                        <span id="tax" aria-label="Impuestos aplicados">$0.00</span>
                     </div>
                     <div class="summary-row summary-total">
                         <span>Total</span>
-                        <span id="total">$0.00</span>
+                        <span id="total" aria-label="Total del pedido">$0.00</span>
                     </div>
                     
-                    <button class="btn checkout-btn" id="checkout-btn">Realizar Pedido</button>
-                </div>
-            </div>
+                    <button class="btn checkout-btn" id="checkout-btn" aria-label="Proceder al pago">Realizar Pedido</button>
+                </section>
+            </main>
         </div>
         
         <!-- Vista de Confirmación -->
-        <div id="confirmation-view" class="view">
-            <div class="content confirmation-view">
-                <div class="confirmation-icon">
+        <div id="confirmation-view" class="view" role="main" aria-label="Confirmación del pedido">
+            <main class="content confirmation-view">
+                <div class="confirmation-icon" aria-hidden="true">
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <h2 class="confirmation-title">¡Pedido Confirmado!</h2>
                 <p class="confirmation-text">Tu pedido ha sido procesado y está siendo preparado. Te llegará en aproximadamente 30-40 minutos.</p>
-                <p class="confirmation-text">Número de pedido: #<span id="order-number">12345</span></p>
+                <p class="confirmation-text">Número de pedido: #<span id="order-number" aria-label="Número de pedido">12345</span></p>
                 
-                <button class="btn back-to-home" id="back-to-home">Volver al Inicio</button>
-            </div>
+                <button class="btn back-to-home" id="back-to-home" aria-label="Volver a la página principal">Volver al Inicio</button>
+            </main>
         </div>
         
         <!-- Vista de Búsqueda -->
-        <div id="search-view" class="view">
-            <header class="app-header">
+        <div id="search-view" class="view" role="main" aria-label="Búsqueda de restaurantes">
+            <header class="app-header" role="banner">
                 <div class="app-logo">
-                    <i class="fas fa-arrow-left" id="back-from-search"></i>
-                    <span>Buscar</span>
+                    <button class="icon-btn" id="back-from-search" aria-label="Volver atrás"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+                    <h1>Buscar</h1>
                 </div>
             </header>
             
-            <div class="search-bar">
+            <div class="search-bar" role="search">
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Buscar restaurantes o platos..." id="search-input">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text" class="search-input" placeholder="Buscar restaurantes o platos..." id="search-input" aria-label="Buscar restaurantes o platos">
                 </div>
             </div>
             
-            <div class="content">
-                <div class="search-results" id="search-results">
+            <main class="content">
+                <div class="search-results" id="search-results" role="list" aria-label="Resultados de búsqueda">
                     <!-- Los resultados de búsqueda se cargarán dinámicamente con JavaScript -->
                 </div>
-            </div>
+            </main>
         </div>
         
         <!-- Vista de Pedidos -->
-        <div id="orders-view" class="view">
-            <header class="app-header">
+        <div id="orders-view" class="view" role="main" aria-label="Historial de pedidos">
+            <header class="app-header" role="banner">
                 <div class="app-logo">
-                    <i class="fas fa-arrow-left" id="back-from-orders"></i>
-                    <span>Mis Pedidos</span>
+                    <button class="icon-btn" id="back-from-orders" aria-label="Volver atrás"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+                    <h1>Mis Pedidos</h1>
                 </div>
             </header>
             
-            <div class="content">
-                <div class="orders-list" id="orders-list">
+            <main class="content">
+                <div class="orders-list" id="orders-list" role="list" aria-label="Lista de pedidos realizados">
                     <!-- Los pedidos se cargarán dinámicamente con JavaScript -->
                 </div>
-            </div>
+            </main>
         </div>
         
         <!-- Vista de Perfil -->
-        <div id="profile-view" class="view">
-            <header class="app-header">
+        <div id="profile-view" class="view" role="main" aria-label="Mi perfil de usuario">
+            <header class="app-header" role="banner">
                 <div class="app-logo">
-                    <i class="fas fa-arrow-left" id="back-from-profile"></i>
-                    <span>Mi Perfil</span>
+                    <button class="icon-btn" id="back-from-profile" aria-label="Volver atrás"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+                    <h1>Mi Perfil</h1>
                 </div>
             </header>
             
-            <div class="content profile-view">
-                <div class="profile-header">
-                    <div class="profile-avatar">
+            <main class="content profile-view">
+                <section class="profile-header">
+                    <div class="profile-avatar" aria-hidden="true">
                         <i class="fas fa-user"></i>
                     </div>
                     <div class="profile-info">
                         <h2 id="user-name">Usuario</h2>
                         <p id="user-email">usuario@ejemplo.com</p>
                     </div>
-                </div>
+                </section>
                 
-                <ul class="profile-menu">
-                    <li class="profile-menu-item">
-                        <div class="menu-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div>Direcciones</div>
-                    </li>
-                    <li class="profile-menu-item">
-                        <div class="menu-icon">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <div>Métodos de Pago</div>
-                    </li>
-                    <li class="profile-menu-item">
-                        <div class="menu-icon">
-                            <i class="fas fa-gift"></i>
-                        </div>
-                        <div>Promociones</div>
-                    </li>
-                    <li class="profile-menu-item">
-                        <div class="menu-icon">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <div>Configuración</div>
-                    </li>
-                    <li class="profile-menu-item">
-                        <div class="menu-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <div>Ayuda</div>
-                    </li>
-                    <li class="profile-menu-item" id="logout-btn">
-                        <div class="menu-icon">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </div>
-                        <div>Cerrar Sesión</div>
-                    </li>
-                </ul>
-            </div>
+                <nav class="profile-menu" role="navigation" aria-label="Opciones del perfil">
+                    <ul>
+                        <li class="profile-menu-item" role="button" tabindex="0" aria-label="Gestionar direcciones">
+                            <div class="menu-icon">
+                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            </div>
+                            <div>Direcciones</div>
+                        </li>
+                        <li class="profile-menu-item" role="button" tabindex="0" aria-label="Gestionar métodos de pago">
+                            <div class="menu-icon">
+                                <i class="fas fa-credit-card" aria-hidden="true"></i>
+                            </div>
+                            <div>Métodos de Pago</div>
+                        </li>
+                        <li class="profile-menu-item" role="button" tabindex="0" aria-label="Ver promociones disponibles">
+                            <div class="menu-icon">
+                                <i class="fas fa-gift" aria-hidden="true"></i>
+                            </div>
+                            <div>Promociones</div>
+                        </li>
+                        <li class="profile-menu-item" role="button" tabindex="0" aria-label="Configurar aplicación">
+                            <div class="menu-icon">
+                                <i class="fas fa-cog" aria-hidden="true"></i>
+                            </div>
+                            <div>Configuración</div>
+                        </li>
+                        <li class="profile-menu-item" role="button" tabindex="0" aria-label="Obtener ayuda">
+                            <div class="menu-icon">
+                                <i class="fas fa-question-circle" aria-hidden="true"></i>
+                            </div>
+                            <div>Ayuda</div>
+                        </li>
+                        <li class="profile-menu-item" id="logout-btn" role="button" tabindex="0" aria-label="Cerrar sesión">
+                            <div class="menu-icon">
+                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                            </div>
+                            <div>Cerrar Sesión</div>
+                        </li>
+                    </ul>
+                </nav>
+            </main>
         </div>
         
         <!-- Vista de Login -->
-        <div id="login-view" class="view active">
-            <div class="content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                <h2>Iniciar Sesión</h2>
-                <input type="email" id="login-email" placeholder="Correo electrónico" style="margin-bottom: 1rem; padding: 0.75rem; width: 80%; border-radius: 8px; border: 1px solid #ccc;">
-                <input type="password" id="login-password" placeholder="Contraseña" style="margin-bottom: 1rem; padding: 0.75rem; width: 80%; border-radius: 8px; border: 1px solid #ccc;">
-                <button class="btn" id="login-btn">Entrar</button>
-                <div id="login-error" class="error-message"></div>
-                <hr style="margin: 2rem 0 1rem 0; width: 80%;">
-                <h3>¿No tienes cuenta?</h3>
-                <input type="text" id="register-name" placeholder="Nombre" style="margin-bottom: 1rem; padding: 0.75rem; width: 80%; border-radius: 8px; border: 1px solid #ccc;">
-                <input type="email" id="register-email" placeholder="Correo electrónico" style="margin-bottom: 1rem; padding: 0.75rem; width: 80%; border-radius: 8px; border: 1px solid #ccc;">
-                <input type="password" id="register-password" placeholder="Contraseña" style="margin-bottom: 1rem; padding: 0.75rem; width: 80%; border-radius: 8px; border: 1px solid #ccc;">
-                <button class="btn" id="register-btn">Registrarse</button>
-                <div id="register-error" class="error-message"></div>
-            </div>
+        <div id="login-view" class="view active login-view" role="main" aria-label="Iniciar sesión">
+            <main class="content">
+                <h1>Iniciar Sesión</h1>
+                <form class="login-form" role="form" aria-label="Formulario de inicio de sesión">
+                    <input type="email" id="login-email" placeholder="Correo electrónico" required aria-label="Correo electrónico">
+                    <input type="password" id="login-password" placeholder="Contraseña" required aria-label="Contraseña">
+                    <button type="submit" class="btn" id="login-btn" aria-label="Iniciar sesión">Entrar</button>
+                    <div id="login-error" class="error-message" role="alert" aria-live="polite"></div>
+                </form>
+                
+                <hr>
+                <h2>¿No tienes cuenta?</h2>
+                <form class="register-form" role="form" aria-label="Formulario de registro">
+                    <input type="text" id="register-name" placeholder="Nombre" required aria-label="Nombre completo">
+                    <input type="email" id="register-email" placeholder="Correo electrónico" required aria-label="Correo electrónico">
+                    <input type="password" id="register-password" placeholder="Contraseña" required aria-label="Contraseña">
+                    <button type="submit" class="btn" id="register-btn" aria-label="Crear cuenta">Registrarse</button>
+                    <div id="register-error" class="error-message" role="alert" aria-live="polite"></div>
+                </form>
+            </main>
         </div>
         
         <!-- Navegación inferior -->
-        <div class="bottom-nav">
-            <div class="nav-item active" data-view="home-view">
-                <div class="nav-icon"><i class="fas fa-home"></i></div>
+        <nav class="bottom-nav" role="navigation" aria-label="Navegación principal">
+            <div class="nav-item active" data-view="home-view" role="button" tabindex="0" aria-label="Ir a inicio">
+                <div class="nav-icon"><i class="fas fa-home" aria-hidden="true"></i></div>
                 <div>Inicio</div>
             </div>
-            <div class="nav-item" data-view="search-view">
-                <div class="nav-icon"><i class="fas fa-search"></i></div>
+            <div class="nav-item" data-view="search-view" role="button" tabindex="0" aria-label="Ir a búsqueda">
+                <div class="nav-icon"><i class="fas fa-search" aria-hidden="true"></i></div>
                 <div>Buscar</div>
             </div>
-            <div class="nav-item" data-view="orders-view">
-                <div class="nav-icon"><i class="fas fa-shopping-bag"></i></div>
+            <div class="nav-item" data-view="orders-view" role="button" tabindex="0" aria-label="Ir a pedidos">
+                <div class="nav-icon"><i class="fas fa-shopping-bag" aria-hidden="true"></i></div>
                 <div>Pedidos</div>
             </div>
-            <div class="nav-item" data-view="cart-view">
-                <div class="nav-icon"><i class="fas fa-shopping-cart">
-                    <span class="cart-badge" id="cart-count">0</span>
-                </i></div>
+            <div class="nav-item" data-view="cart-view" role="button" tabindex="0" aria-label="Ir al carrito">
+                <div class="nav-icon">
+                    <i class="fas fa-shopping-cart" aria-hidden="true">
+                        <span class="cart-badge" id="cart-count" aria-label="Número de elementos en el carrito">0</span>
+                    </i>
+                </div>
                 <div>Carrito</div>
             </div>
-            <div class="nav-item" data-view="profile-view">
-                <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div class="nav-item" data-view="profile-view" role="button" tabindex="0" aria-label="Ir al perfil">
+                <div class="nav-icon"><i class="fas fa-user" aria-hidden="true"></i></div>
                 <div>Perfil</div>
             </div>
-        </div>
+        </nav>
     </div>
 
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/supabase.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

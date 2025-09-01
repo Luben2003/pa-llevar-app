@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Pa Llevar Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #F0F2F8;
+        }
+        .test-container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- Vista de Login -->
+        <div id="login-view" class="view active login-view" role="main" aria-label="Iniciar sesión">
+            <main class="content">
+                <h1>Iniciar Sesión</h1>
+                <form class="login-form" role="form" aria-label="Formulario de inicio de sesión">
+                    <input type="email" id="login-email" placeholder="Correo electrónico" required aria-label="Correo electrónico">
+                    <input type="password" id="login-password" placeholder="Contraseña" required aria-label="Contraseña">
+                    <button type="submit" class="btn" id="login-btn" aria-label="Iniciar sesión">Entrar</button>
+                    <div id="login-error" class="error-message" role="alert" aria-live="polite"></div>
+                </form>
+                
+                <hr>
+                <h2>¿No tienes cuenta?</h2>
+                <form class="register-form" role="form" aria-label="Formulario de registro">
+                    <input type="text" id="register-name" placeholder="Nombre" required aria-label="Nombre completo">
+                    <input type="email" id="register-email" placeholder="Correo electrónico" required aria-label="Correo electrónico">
+                    <input type="password" id="register-password" placeholder="Contraseña" required aria-label="Contraseña">
+                    <button type="submit" class="btn" id="register-btn" aria-label="Crear cuenta">Registrarse</button>
+                    <div id="register-error" class="error-message" role="alert" aria-live="polite"></div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // Test simple del sistema de login
+        console.log('🧪 Iniciando test de login...');
+        
+        // Verificar que los elementos existen
+        const loginForm = document.querySelector('.login-form');
+        const registerForm = document.querySelector('.register-form');
+        const loginView = document.getElementById('login-view');
+        
+        console.log('Login form:', loginForm);
+        console.log('Register form:', registerForm);
+        console.log('Login view:', loginView);
+        
+        // Test de validación
+        function testValidation() {
+            console.log('Testing validation...');
+            console.log('Email validation:', isValidEmail('test@example.com'));
+            console.log('Password validation:', isValidPassword('123456'));
+        }
+        
+        // Test de notificaciones
+        function testNotifications() {
+            console.log('Testing notifications...');
+            showNotification('Test de notificación', 'success');
+        }
+        
+        // Event listeners para test
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                console.log('Login form submitted');
+                showNotification('Login exitoso (test)', 'success');
+            });
+        }
+        
+        if (registerForm) {
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                console.log('Register form submitted');
+                showNotification('Registro exitoso (test)', 'success');
+            });
+        }
+        
+        // Ejecutar tests
+        setTimeout(() => {
+            testValidation();
+            testNotifications();
+        }, 1000);
+        
+        console.log('✅ Test iniciado');
+    </script>
+</body>
+</html>

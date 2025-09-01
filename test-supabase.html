@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase - Pa Llevar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #F0F2F8;
+            font-family: 'Inter', sans-serif;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #2D5BFF;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .test-button:hover {
+            background: #1A46E0;
+        }
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Supabase - Pa Llevar</h1>
+        
+        <div class="test-section">
+            <h3>1. Configuración</h3>
+            <p>Verificando configuración de Supabase...</p>
+            <div id="config-result" class="result info">Cargando...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Conexión</h3>
+            <button class="test-button" onclick="testConnection()">Probar Conexión</button>
+            <div id="connection-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Autenticación</h3>
+            <button class="test-button" onclick="testSignUp()">Probar Registro</button>
+            <button class="test-button" onclick="testSignIn()">Probar Login</button>
+            <button class="test-button" onclick="testSignOut()">Probar Logout</button>
+            <div id="auth-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Base de Datos</h3>
+            <button class="test-button" onclick="testGetRestaurants()">Obtener Restaurantes</button>
+            <button class="test-button" onclick="testSearch()">Probar Búsqueda</button>
+            <div id="db-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Estado Actual</h3>
+            <div id="current-state" class="result info">Cargando...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Test de configuración
+        function testConfig() {
+            const configDiv = document.getElementById('config-result');
+            try {
+                if (CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY) {
+                    configDiv.className = 'result success';
+                    configDiv.innerHTML = `
+                        ✅ Configuración encontrada<br>
+                        URL: ${CONFIG.SUPABASE_URL}<br>
+                        Anon Key: ${CONFIG.SUPABASE_ANON_KEY.substring(0, 20)}...
+                    `;
+                } else {
+                    configDiv.className = 'result error';
+                    configDiv.innerHTML = '❌ Configuración faltante. Revisa config.js';
+                }
+            } catch (error) {
+                configDiv.className = 'result error';
+                configDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test de conexión
+        async function testConnection() {
+            const resultDiv = document.getElementById('connection-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '🔄 Probando conexión...';
+            
+            try {
+                const { data, error } = await supabase.from('restaurants').select('count').limit(1);
+                
+                if (error) {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error de conexión: ${error.message}`;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = '✅ Conexión exitosa con Supabase';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test de registro
+        async function testSignUp() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '🔄 Probando registro...';
+            
+            try {
+                const testEmail = `test-${Date.now()}@example.com`;
+                const result = await SupabaseService.signUp(testEmail, '123456', { name: 'Test User' });
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Registro exitoso: ${testEmail}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error en registro: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test de login
+        async function testSignIn() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '🔄 Probando login...';
+            
+            try {
+                const result = await SupabaseService.signIn('test@example.com', '123456');
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Login exitoso: ${result.data.user.email}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error en login: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test de logout
+        async function testSignOut() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '🔄 Probando logout...';
+            
+            try {
+                const result = await SupabaseService.signOut();
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = '✅ Logout exitoso';
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error en logout: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test de restaurantes
+        async function testGetRestaurants() {
+            const resultDiv = document.getElementById('db-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '🔄 Obteniendo restaurantes...';
+            
+            try {
+                const result = await SupabaseService.getRestaurants();
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ ${result.data.length} restaurantes encontrados`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test de búsqueda
+        async function testSearch() {
+            const resultDiv = document.getElementById('db-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '🔄 Probando búsqueda...';
+            
+            try {
+                const result = await SupabaseService.searchRestaurants('pizza');
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Búsqueda exitosa: ${result.data.length} resultados para "pizza"`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Actualizar estado actual
+        async function updateCurrentState() {
+            const stateDiv = document.getElementById('current-state');
+            
+            try {
+                const userResult = await SupabaseService.getCurrentUser();
+                const isAuth = await SupabaseService.isAuthenticated();
+                
+                stateDiv.innerHTML = `
+                    <strong>Estado Actual:</strong><br>
+                    Autenticado: ${isAuth ? '✅ Sí' : '❌ No'}<br>
+                    Usuario: ${userResult.success ? userResult.user.email : 'Ninguno'}<br>
+                    URL: ${CONFIG.SUPABASE_URL}<br>
+                    Timestamp: ${new Date().toLocaleString()}
+                `;
+            } catch (error) {
+                stateDiv.className = 'result error';
+                stateDiv.innerHTML = `❌ Error obteniendo estado: ${error.message}`;
+            }
+        }
+
+        // Inicializar tests
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Iniciando tests de Supabase...');
+            testConfig();
+            updateCurrentState();
+            
+            // Actualizar estado cada 5 segundos
+            setInterval(updateCurrentState, 5000);
+        });
+    </script>
+</body>
+</html>
